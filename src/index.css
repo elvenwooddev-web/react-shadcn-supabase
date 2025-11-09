@@ -1,0 +1,92 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+@theme {
+  /* Border radius */
+  --radius: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Font Family */
+  --font-family-sans: 'Inter', sans-serif;
+
+  /* Light mode colors - InteriorsFlow theme */
+  --color-background: oklch(97% 0.003 264);
+  --color-foreground: oklch(28% 0.015 256);
+  --color-card: oklch(100% 0 0);
+  --color-card-foreground: oklch(28% 0.015 256);
+  --color-popover: oklch(100% 0 0);
+  --color-popover-foreground: oklch(28% 0.015 256);
+
+  /* Primary: #1193d4 */
+  --color-primary: oklch(59% 0.14 232);
+  --color-primary-foreground: oklch(100% 0 0);
+
+  /* Success: #22c55e */
+  --color-success: oklch(68% 0.17 145);
+  --color-success-foreground: oklch(100% 0 0);
+
+  /* Warning: #f59e0b */
+  --color-warning: oklch(72% 0.17 65);
+  --color-warning-foreground: oklch(100% 0 0);
+
+  /* Danger: #ef4444 */
+  --color-danger: oklch(62% 0.22 25);
+  --color-danger-foreground: oklch(100% 0 0);
+
+  --color-secondary: oklch(95% 0.005 264);
+  --color-secondary-foreground: oklch(28% 0.015 256);
+  --color-muted: oklch(95% 0.005 264);
+  --color-muted-foreground: oklch(55% 0.015 256);
+  --color-accent: oklch(95% 0.005 264);
+  --color-accent-foreground: oklch(28% 0.015 256);
+  --color-destructive: oklch(62% 0.22 25);
+  --color-destructive-foreground: oklch(100% 0 0);
+  --color-border: oklch(88% 0.005 264);
+  --color-input: oklch(88% 0.005 264);
+  --color-ring: oklch(59% 0.14 232);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.dark {
+  /* Dark mode: #101c22 */
+  --color-background: oklch(14% 0.015 232);
+  --color-foreground: oklch(90% 0.005 264);
+  --color-card: oklch(14% 0.015 232);
+  --color-card-foreground: oklch(90% 0.005 264);
+  --color-popover: oklch(14% 0.015 232);
+  --color-popover-foreground: oklch(90% 0.005 264);
+
+  /* Primary stays same in dark mode */
+  --color-primary: oklch(59% 0.14 232);
+  --color-primary-foreground: oklch(100% 0 0);
+
+  /* Success, Warning, Danger stay same */
+  --color-success: oklch(68% 0.17 145);
+  --color-warning: oklch(72% 0.17 65);
+  --color-danger: oklch(62% 0.22 25);
+
+  --color-secondary: oklch(22% 0.015 264);
+  --color-secondary-foreground: oklch(90% 0.005 264);
+  --color-muted: oklch(22% 0.015 264);
+  --color-muted-foreground: oklch(70% 0.01 264);
+  --color-accent: oklch(22% 0.015 264);
+  --color-accent-foreground: oklch(90% 0.005 264);
+  --color-destructive: oklch(62% 0.22 25);
+  --color-destructive-foreground: oklch(100% 0 0);
+  --color-border: oklch(25% 0.015 264);
+  --color-input: oklch(25% 0.015 264);
+  --color-ring: oklch(59% 0.14 232);
+}
