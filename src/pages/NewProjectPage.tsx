@@ -1,26 +1,46 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Home, Store } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { useProjects } from '@/contexts/ProjectContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 export function NewProjectPage() {
   const navigate = useNavigate()
-  const { createProject } = useProjects()
+  const { createProject, projects } = useProjects()
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     clientName: '',
     projectType: '',
+    projectCode: '',
     startDate: new Date().toISOString().split('T')[0],
     estimatedCompletion: '',
     projectManagerId: 'tm2', // Default to Sam Wilson
     templateType: 'residential' as 'residential' | 'retail',
   })
+
+  // Auto-generate project code suggestion from name
+  const generateCodeFromName = (name: string): string => {
+    const words = name.trim().split(/\s+/)
+    if (words.length === 0 || !words[0]) return ''
+
+    if (words.length === 1) {
+      return words[0].substring(0, 4).toUpperCase()
+    } else {
+      return (words[0].substring(0, 2) + words[1].substring(0, 2)).toUpperCase()
+    }
+  }
+
+  const handleNameChange = (name: string) => {
+    setFormData({
+      ...formData,
+      name,
+      projectCode: formData.projectCode || generateCodeFromName(name),
+    })
+  }
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -49,53 +69,33 @@ export function NewProjectPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-3">
-                <Label>Template Type*</Label>
-                <RadioGroup
-                  value={formData.templateType}
-                  onValueChange={(value: 'residential' | 'retail') =>
-                    setFormData({ ...formData, templateType: value })
-                  }
-                  className="grid grid-cols-2 gap-4"
-                >
-                  <Label
-                    htmlFor="residential"
-                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer [&:has([data-state=checked])]:border-primary"
-                  >
-                    <RadioGroupItem value="residential" id="residential" className="sr-only" />
-                    <Home className="mb-3 h-6 w-6" />
-                    <div className="space-y-1 text-center">
-                      <p className="text-sm font-medium leading-none">Residential/Home</p>
-                      <p className="text-xs text-muted-foreground">
-                        For apartments, villas, and homes
-                      </p>
-                    </div>
-                  </Label>
-                  <Label
-                    htmlFor="retail"
-                    className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer [&:has([data-state=checked])]:border-primary"
-                  >
-                    <RadioGroupItem value="retail" id="retail" className="sr-only" />
-                    <Store className="mb-3 h-6 w-6" />
-                    <div className="space-y-1 text-center">
-                      <p className="text-sm font-medium leading-none">Retail/Commercial</p>
-                      <p className="text-xs text-muted-foreground">
-                        For stores, showrooms, and offices
-                      </p>
-                    </div>
-                  </Label>
-                </RadioGroup>
-              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="name">Project Name*</Label>
+                  <Input
+                    id="name"
+                    required
+                    value={formData.name}
+                    onChange={(e) => handleNameChange(e.target.value)}
+                    placeholder="e.g., Miller Residence"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="name">Project Name*</Label>
-                <Input
-                  id="name"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g., Miller Residence"
-                />
+                <div className="space-y-2">
+                  <Label htmlFor="projectCode">
+                    Code*
+                    <span className="text-xs text-muted-foreground ml-1">(auto-generated)</span>
+                  </Label>
+                  <Input
+                    id="projectCode"
+                    required
+                    value={formData.projectCode}
+                    onChange={(e) => setFormData({ ...formData, projectCode: e.target.value.toUpperCase() })}
+                    placeholder="MIL"
+                    maxLength={6}
+                    className="font-mono"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">

@@ -1,13 +1,15 @@
 import { useProjects } from '@/contexts/ProjectContext'
+import { useIssues } from '@/contexts/IssueContext'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { Briefcase, CheckCircle2, Clock, AlertTriangle, TrendingUp } from 'lucide-react'
+import { Briefcase, CheckCircle2, Clock, AlertTriangle, TrendingUp, AlertCircle } from 'lucide-react'
 import { loadFromLocalStorage } from '@/lib/helpers'
 import type { Task } from '@/types'
 
 export function HomeSidebar() {
   const { projects } = useProjects()
+  const { allIssues, getOpenIssuesCount, getCriticalIssuesCount } = useIssues()
 
   // Load all tasks from localStorage
   const allTasksData: Record<string, Task[]> = loadFromLocalStorage('tasks', {})
@@ -39,11 +41,11 @@ export function HomeSidebar() {
 
   // Get recent projects (last 3)
   const recentProjects = projects
-    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, 3)
 
   return (
-    <aside className="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-[#101c22] p-6 space-y-6">
+    <aside className="w-80 border-l border-border bg-card p-6 space-y-6">
       {/* Overview Stats */}
       <Card>
         <CardHeader className="pb-3">
@@ -92,6 +94,22 @@ export function HomeSidebar() {
               </div>
               <span className="font-semibold text-danger">{stats.blockedTasks}</span>
             </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm">
+                <AlertCircle className="h-4 w-4 text-orange-500" />
+                <span className="text-muted-foreground">Open Issues</span>
+              </div>
+              <span className="font-semibold text-orange-700 dark:text-orange-400">{getOpenIssuesCount()}</span>
+            </div>
+            {getCriticalIssuesCount() > 0 && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm">
+                  <AlertTriangle className="h-4 w-4 text-red-500" />
+                  <span className="text-muted-foreground">Critical Issues</span>
+                </div>
+                <span className="font-semibold text-red-700 dark:text-red-400">{getCriticalIssuesCount()}</span>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -115,7 +133,7 @@ export function HomeSidebar() {
               return (
                 <div
                   key={project.id}
-                  className="p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary/50 transition-colors cursor-pointer"
+                  className="p-3 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
                 >
                   <div className="flex items-start gap-3 mb-2">
                     <div

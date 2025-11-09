@@ -1,7 +1,18 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
-import type { Project, ProjectContextType, CreateProjectForm, TeamMember } from '@/types'
+import type { Project, ProjectContextType, CreateProjectForm, TeamMember, ProjectStage, WorkflowStage } from '@/types'
+import { STAGE_TO_DEPARTMENT } from '@/types'
 import { generateId, saveToLocalStorage, loadFromLocalStorage } from '@/lib/helpers'
 import { loadTemplate } from '@/lib/templateLoader'
+
+const WORKFLOW_STAGES: WorkflowStage[] = [
+  'Sales',
+  'Design',
+  'Technical Design',
+  'Procurement',
+  'Production',
+  'Execution',
+  'Post Installation',
+]
 
 // Sample data for initial project
 const sampleTeamMembers: TeamMember[] = [
@@ -28,9 +39,25 @@ const sampleTeamMembers: TeamMember[] = [
   },
 ]
 
+const initialProjectStages: ProjectStage[] = WORKFLOW_STAGES.map((stage, index) => ({
+  id: `p1-${stage.toLowerCase().replace(/\s+/g, '-')}`,
+  stage,
+  status: index < 2 ? 'completed' : index === 2 ? 'active' : 'pending',
+  priority: index === 2 ? 'high' : 'medium',
+  startDate: index < 3 ? '12 Sep 2023' : null,
+  dueDate: null,
+  completedDate: index < 2 ? '20 Sep 2023' : null,
+  departmentHead: sampleTeamMembers.find(tm =>
+    tm.role.toLowerCase().includes(STAGE_TO_DEPARTMENT[stage].toLowerCase())
+  ) || null,
+  createdAt: new Date('2023-09-12'),
+  updatedAt: new Date(),
+}))
+
 const initialProjects: Project[] = [
   {
     id: 'p1',
+    projectCode: 'MIL',
     name: 'Miller Residence',
     description: '3BHK luxury apartment interior design and execution',
     clientName: 'The Miller Family',
@@ -38,10 +65,14 @@ const initialProjects: Project[] = [
     startDate: '12 Sep 2023',
     estimatedCompletion: '15 Jan 2024',
     currentStage: 'Technical Design',
+    stages: initialProjectStages,
     status: 'active',
     projectManager: sampleTeamMembers[1],
     teamMembers: sampleTeamMembers,
     logo: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCLK-XTosv8BP4U_le6d-r1SExTXx_iH6BJTPJtN0ff4M_Xn-_d_EMD6PdeAE4vHffvsZ4N6esOi4dDII5ymV1pQyRTwuma5slVsDeicDjA3N6Kbwc6LLZGrLkHh4uWeyZrRgdwQzYChJimdFuI_muP-6QwywpOVZeKWZkzUqQjh9YF8h4tF-_u9SZ7ST5MIQGg53c4axqeTy4s7DZUY1Ol56t44thRIC23l4WC2IQX-vxMbIAx9aBS6U1-2coYtued_vj5Pxpmrh4G',
+    taskCounter: 0,
+    subtaskCounter: 0,
+    issueCounter: 0,
     createdAt: new Date('2023-09-12'),
     updatedAt: new Date(),
   },
@@ -49,13 +80,67 @@ const initialProjects: Project[] = [
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
 
+// Helper function to generate project code from name
+function generateProjectCode(name: string, existingProjects: Project[]): string {
+  // Take first 3-4 letters of first word(s) and uppercase
+  const words = name.trim().split(/\s+/)
+  let code = ''
+
+  if (words.length === 1) {
+    code = words[0].substring(0, 4).toUpperCase()
+  } else {
+    // Take first 2 letters of first two words
+    code = (words[0].substring(0, 2) + words[1].substring(0, 2)).toUpperCase()
+  }
+
+  // Ensure uniqueness
+  let finalCode = code
+  let counter = 1
+  while (existingProjects.some(p => p.projectCode === finalCode)) {
+    finalCode = `${code}${counter}`
+    counter++
+  }
+
+  return finalCode
+}
+
 export function ProjectProvider({ children }: { children: ReactNode }) {
-  const [projects, setProjects] = useState<Project[]>(() =>
-    loadFromLocalStorage('projects', initialProjects)
-  )
-  const [currentProject, setCurrentProject] = useState<Project | null>(() =>
-    loadFromLocalStorage('currentProject', projects[0] || null)
-  )
+  const [projects, setProjects] = useState<Project[]>(() => {
+    const loadedProjects = loadFromLocalStorage('projects', initialProjects)
+
+    // Migration: Add projectCode and counters to existing projects
+    return loadedProjects.map((project) => {
+      if (!project.projectCode) {
+        return {
+          ...project,
+          projectCode: generateProjectCode(project.name, loadedProjects),
+          taskCounter: project.taskCounter ?? 0,
+          subtaskCounter: project.subtaskCounter ?? 0,
+          issueCounter: project.issueCounter ?? 0,
+        }
+      }
+      return {
+        ...project,
+        taskCounter: project.taskCounter ?? 0,
+        subtaskCounter: project.subtaskCounter ?? 0,
+        issueCounter: project.issueCounter ?? 0,
+      }
+    })
+  })
+
+  const [currentProject, setCurrentProject] = useState<Project | null>(() => {
+    const loaded = loadFromLocalStorage('currentProject', projects[0] || null)
+    if (loaded && !loaded.projectCode) {
+      return {
+        ...loaded,
+        projectCode: generateProjectCode(loaded.name, projects),
+        taskCounter: loaded.taskCounter ?? 0,
+        subtaskCounter: loaded.subtaskCounter ?? 0,
+        issueCounter: loaded.issueCounter ?? 0,
+      }
+    }
+    return loaded
+  })
 
   // Save to localStorage whenever projects change
   useEffect(() => {
@@ -68,9 +153,68 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
 
   const createProject = (data: CreateProjectForm) => {
     const projectManager = sampleTeamMembers.find((tm) => tm.id === data.projectManagerId) || sampleTeamMembers[0]
+    const projectId = generateId()
+
+    // Load template data if template type is provided
+    let templateStages = data.templateType ? loadTemplate(data.templateType, projectId, [projectManager]).stages : undefined
+
+    // Initialize stages with metadata (use template stages if available)
+    const projectStages: ProjectStage[] = WORKFLOW_STAGES.map((stage, index) => {
+      const templateStage = templateStages?.find(ts => ts.stage === stage)
+
+      if (templateStage) {
+        // Use template stage configuration
+        const departmentHead = sampleTeamMembers.find(
+          tm => tm.role.toLowerCase().includes(templateStage.departmentHeadRole.toLowerCase())
+        )
+
+        // Calculate due date from project start
+        const dueDate = templateStage.dueDate
+          ? (() => {
+              const d = new Date(data.startDate)
+              d.setDate(d.getDate() + parseInt(templateStage.dueDate))
+              return d.toISOString().split('T')[0]
+            })()
+          : null
+
+        return {
+          id: `${projectId}-${stage.toLowerCase().replace(/\s+/g, '-')}`,
+          stage,
+          status: index === 0 ? 'active' : templateStage.status,
+          priority: templateStage.priority,
+          startDate: index === 0 ? data.startDate : null,
+          dueDate,
+          completedDate: null,
+          departmentHead: departmentHead || null,
+          notes: templateStage.notes,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+      } else {
+        // Fall back to auto-initialization
+        const owningDepartment = STAGE_TO_DEPARTMENT[stage]
+        const departmentHead = sampleTeamMembers.find(
+          tm => tm.role.toLowerCase().includes(owningDepartment.toLowerCase())
+        )
+
+        return {
+          id: `${projectId}-${stage.toLowerCase().replace(/\s+/g, '-')}`,
+          stage,
+          status: index === 0 ? 'active' : 'pending',
+          priority: 'medium',
+          startDate: index === 0 ? data.startDate : null,
+          dueDate: null,
+          completedDate: null,
+          departmentHead: departmentHead || null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+      }
+    })
 
     const newProject: Project = {
-      id: generateId(),
+      id: projectId,
+      projectCode: data.projectCode || generateProjectCode(data.name, projects),
       name: data.name,
       description: data.description,
       clientName: data.clientName,
@@ -78,10 +222,14 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       startDate: data.startDate,
       estimatedCompletion: data.estimatedCompletion,
       currentStage: 'Sales',
+      stages: projectStages,
       status: 'active',
       projectManager,
       teamMembers: [projectManager],
       logo: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=1193d4&color=fff`,
+      taskCounter: 0,
+      subtaskCounter: 0,
+      issueCounter: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     }
@@ -130,6 +278,42 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const getNextTaskTrackingId = (): string => {
+    if (!currentProject) return 'TASK-000'
+
+    const nextCounter = currentProject.taskCounter + 1
+    const trackingId = `${currentProject.projectCode}-TASK-${String(nextCounter).padStart(3, '0')}`
+
+    // Update the counter
+    updateProject(currentProject.id, { taskCounter: nextCounter })
+
+    return trackingId
+  }
+
+  const getNextSubtaskTrackingId = (): string => {
+    if (!currentProject) return 'SUB-000'
+
+    const nextCounter = currentProject.subtaskCounter + 1
+    const trackingId = `${currentProject.projectCode}-SUB-${String(nextCounter).padStart(3, '0')}`
+
+    // Update the counter
+    updateProject(currentProject.id, { subtaskCounter: nextCounter })
+
+    return trackingId
+  }
+
+  const getNextIssueTrackingId = (): string => {
+    if (!currentProject) return 'ISS-000'
+
+    const nextCounter = currentProject.issueCounter + 1
+    const trackingId = `${currentProject.projectCode}-ISS-${String(nextCounter).padStart(3, '0')}`
+
+    // Update the counter
+    updateProject(currentProject.id, { issueCounter: nextCounter })
+
+    return trackingId
+  }
+
   return (
     <ProjectContext.Provider
       value={{
@@ -139,6 +323,9 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         createProject,
         updateProject,
         deleteProject,
+        getNextTaskTrackingId,
+        getNextSubtaskTrackingId,
+        getNextIssueTrackingId,
       }}
     >
       {children}

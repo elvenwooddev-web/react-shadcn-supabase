@@ -8,11 +8,11 @@ export function Header() {
   const navigate = useNavigate()
 
   return (
-    <header className="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 px-6 py-3 bg-white dark:bg-[#101c22] sticky top-0 z-20">
+    <header className="flex items-center justify-between whitespace-nowrap border-b border-border px-6 py-3 bg-card sticky top-0 z-20">
       <div className="flex items-center gap-8">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-3 text-slate-900 dark:text-slate-50 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-3 text-foreground hover:opacity-80 transition-opacity"
         >
           <div className="size-6 text-primary">
             <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
@@ -32,7 +32,7 @@ export function Header() {
           variant="ghost"
           size="sm"
           onClick={() => navigate('/')}
-          className="text-slate-600 dark:text-slate-400"
+          className="text-muted-foreground"
         >
           <LayoutGrid className="h-4 w-4 mr-2" />
           All Projects
@@ -41,11 +41,11 @@ export function Header() {
       <div className="flex flex-1 justify-end gap-4">
         <div className="flex w-full max-w-64">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 dark:text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search projects..."
-              className="h-10 pl-9 bg-slate-100 dark:bg-slate-800 border-none"
+              className="h-10 pl-9 bg-muted border-none"
             />
           </div>
         </div>
@@ -53,14 +53,15 @@ export function Header() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700"
+            className="h-10 w-10 bg-muted hover:bg-muted/80"
           >
             <Bell className="h-5 w-5" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700"
+            className="h-10 w-10 bg-muted hover:bg-muted/80"
+            onClick={() => navigate('/settings')}
           >
             <Settings className="h-5 w-5" />
           </Button>

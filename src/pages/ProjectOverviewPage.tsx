@@ -11,7 +11,7 @@ export function ProjectOverviewPage() {
 
   if (!currentProject) {
     return (
-      <main className="flex-1 p-6 lg:p-8 flex items-center justify-center">
+      <main className="flex-1 p-6 lg:p-8 bg-background flex items-center justify-center">
         <p className="text-muted-foreground">No project selected</p>
       </main>
     )
@@ -24,7 +24,7 @@ export function ProjectOverviewPage() {
   const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0
 
   return (
-    <main className="flex-1 p-6 lg:p-8">
+    <main className="flex-1 p-6 lg:p-8 bg-background">
       <div className="mb-6">
         <h1 className="text-3xl font-black text-foreground mb-2">{currentProject.name}</h1>
         <p className="text-muted-foreground">

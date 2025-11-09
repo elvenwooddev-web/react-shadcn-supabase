@@ -14,16 +14,16 @@ export function TaskList() {
   const { files } = useFiles()
 
   return (
-    <div className="bg-white dark:bg-slate-900/50 rounded-xl p-6 border border-slate-200 dark:border-slate-800">
+    <div className="bg-card rounded-xl p-6 border border-border">
       {/* Tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800 mb-6">
+      <div className="flex border-b border-border mb-6">
         <button
           onClick={() => setActiveTab('tasks')}
           className={cn(
             'px-4 py-3 text-sm border-b-2',
             activeTab === 'tasks'
               ? 'border-primary text-primary font-semibold'
-              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium'
+              : 'border-transparent text-muted-foreground hover:text-slate-800 dark:hover:text-slate-200 font-medium'
           )}
         >
           Current Tasks
@@ -34,7 +34,7 @@ export function TaskList() {
             'px-4 py-3 text-sm border-b-2',
             activeTab === 'files'
               ? 'border-primary text-primary font-semibold'
-              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium'
+              : 'border-transparent text-muted-foreground hover:text-slate-800 dark:hover:text-slate-200 font-medium'
           )}
         >
           Required Files
@@ -45,7 +45,7 @@ export function TaskList() {
             'px-4 py-3 text-sm border-b-2',
             activeTab === 'documents'
               ? 'border-primary text-primary font-semibold'
-              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium'
+              : 'border-transparent text-muted-foreground hover:text-slate-800 dark:hover:text-slate-200 font-medium'
           )}
         >
           Stage Documents
@@ -70,25 +70,25 @@ export function TaskList() {
       {activeTab === 'files' && (
         <div>
           {/* Table Header */}
-          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-6 items-center py-2 px-4 text-xs font-semibold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase">
+          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-6 items-center py-2 px-4 text-xs font-semibold text-muted-foreground border-b border-border uppercase">
             <span>File Name</span>
             <span className="text-center">Required From</span>
             <span className="text-center">Status</span>
             <span className="text-right">Actions</span>
           </div>
           {/* Table Rows */}
-          <div className="divide-y divide-slate-200 dark:divide-slate-800">
+          <div className="divide-y divide-border">
             {files.map((file) => (
               <div
                 key={file.id}
-                className="grid grid-cols-[1fr_auto_auto_auto] gap-x-6 items-center py-4 px-4 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                className="grid grid-cols-[1fr_auto_auto_auto] gap-x-6 items-center py-4 px-4 hover:bg-muted"
               >
                 {/* File Name */}
                 <div>
-                  <p className="font-medium text-slate-800 dark:text-slate-200">
+                  <p className="font-medium text-foreground">
                     {file.fileName}
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-muted-foreground">
                     {file.uploadDate ? `Uploaded: ${file.uploadDate}` : 'Not yet uploaded'}
                   </p>
                 </div>
@@ -129,7 +129,7 @@ export function TaskList() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700"
+                      className="h-8 w-8 hover:bg-muted/80"
                     >
                       <Download className="h-5 w-5" />
                     </Button>
@@ -138,7 +138,7 @@ export function TaskList() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 px-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600"
+                        className="h-8 px-3 bg-muted hover:bg-muted/80"
                       >
                         Upload
                       </Button>
@@ -146,7 +146,7 @@ export function TaskList() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 hover:bg-slate-200 dark:hover:bg-slate-700"
+                          className="h-8 w-8 hover:bg-muted/80"
                         >
                           <MoreVertical className="h-5 w-5" />
                         </Button>

@@ -7,6 +7,7 @@ import { useUser } from './UserContext'
 const initialTasks: Task[] = [
   {
     id: 't1',
+    trackingId: 'MIL-TASK-001',
     title: 'Create GFC drawings',
     dueDate: '25 Oct 2023',
     assignee: {
@@ -28,6 +29,7 @@ const initialTasks: Task[] = [
   },
   {
     id: 't2',
+    trackingId: 'MIL-TASK-002',
     title: 'Finalize electrical layout',
     dueDate: '28 Oct 2023',
     assignee: {
@@ -43,19 +45,31 @@ const initialTasks: Task[] = [
     subtasks: [
       {
         id: 's2-1',
+        trackingId: 'MIL-SUB-001',
         label: 'Draft switchboard locations',
         completed: true,
+        status: 'completed',
+        priority: 'medium',
         assigneeId: 'tm3',
         avatar:
           'https://lh3.googleusercontent.com/aida-public/AB6AXuBfwFajECFmWo-rM-moBTNXmq3a-104Hqxh8Hb2N0Ap6GJnshoqCFD9AHFREUKMeS522sVLiLg3MJxCvgjFYP39SUnOjaFDKVJ7U2-OkK6OaUIIwPuOVB4MGMi6twceTtAsX4pr6SZSAcVMAa00w_NFfKq-KZLBMPsPGerK4DMzodPkZOf4QhwW8WG_gCNpkktdlekdgVMbmRAXWVdRkk94Lq0_kIzSXCtLyJyUVT9cjkps6nxsAu7LJFgyODFfBxWOSXQVVwAHtJgd',
+        attachments: [],
+        createdAt: new Date('2023-10-22'),
+        updatedAt: new Date('2023-10-25'),
       },
       {
         id: 's2-2',
+        trackingId: 'MIL-SUB-002',
         label: 'Get client sign-off',
         completed: false,
+        status: 'in-progress',
+        priority: 'high',
         assigneeId: 'tm2',
         avatar:
           'https://lh3.googleusercontent.com/aida-public/AB6AXuA9Bs1IwWE6c4QmJyy-6X-tgGEYphrHWl03-EG0ILDpEkJIo3tVWwxD0psqzNhZGu7hgwdYgYuInfOlZfWESWulHWLkQN32liEKNkKBkZtS0GDRWhNuUrKH32bGrs5CoBJwDq4WrhDemhNf0IAm_o4RxQjGlMQ4Xz5lwxRBsMzGsRyipMb2wi9BRK6w_jGuAXl63yVXNYrLFGq58o2ZvGIbfWfn8FDJk3VfZwbuCYyf_iwlrJWw55LQVPZvs2rWE0AvEksO2Y5qYOjw',
+        attachments: [],
+        createdAt: new Date('2023-10-22'),
+        updatedAt: new Date('2023-10-27'),
       },
     ],
     createdAt: new Date('2023-10-22'),
@@ -66,11 +80,36 @@ const initialTasks: Task[] = [
 const TaskContext = createContext<TaskContextType | undefined>(undefined)
 
 export function TaskProvider({ children }: { children: ReactNode }) {
-  const { currentProject } = useProjects()
+  const { currentProject, getNextTaskTrackingId, getNextSubtaskTrackingId } = useProjects()
   const { canAccessStage } = useUser()
-  const [allTasks, setAllTasks] = useState<Record<string, Task[]>>(() =>
-    loadFromLocalStorage('tasks', { p1: initialTasks })
-  )
+  const [allTasks, setAllTasks] = useState<Record<string, Task[]>>(() => {
+    const loaded = loadFromLocalStorage('tasks', { p1: initialTasks })
+
+    // Migrate old subtask data to new format and add tracking IDs
+    const migrated: Record<string, Task[]> = {}
+    Object.keys(loaded).forEach(projectId => {
+      let taskCounter = 1
+      let subtaskCounter = 1
+
+      migrated[projectId] = loaded[projectId].map(task => ({
+        ...task,
+        trackingId: task.trackingId || `TEMP-TASK-${String(taskCounter++).padStart(3, '0')}`,
+        subtasks: task.subtasks?.map(st => ({
+          ...st,
+          trackingId: st.trackingId || `TEMP-SUB-${String(subtaskCounter++).padStart(3, '0')}`,
+          status: st.status || (st.completed ? 'completed' : 'todo'),
+          priority: st.priority || 'medium',
+          description: st.description || undefined,
+          dueDate: st.dueDate || undefined,
+          attachments: st.attachments || [],
+          createdAt: st.createdAt || new Date(),
+          updatedAt: st.updatedAt || new Date(),
+        }))
+      }))
+    })
+
+    return migrated
+  })
 
   // Filter tasks based on user's department permissions
   const allProjectTasks = currentProject ? allTasks[currentProject.id] || [] : []
@@ -85,6 +124,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
 
     const newTask: Task = {
       id: generateId(),
+      trackingId: getNextTaskTrackingId(),
       title: data.title,
       description: data.description,
       dueDate: data.dueDate,
@@ -145,12 +185,25 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       [currentProject.id]: prev[currentProject.id].map((task) => {
         if (task.id === taskId) {
           const assignee = currentProject.teamMembers.find((tm) => tm.id === data.assigneeId)
-          const newSubtask = {
+          const assignees = data.assigneeIds
+            ? currentProject.teamMembers.filter(tm => data.assigneeIds?.includes(tm.id))
+            : undefined
+
+          const newSubtask: Subtask = {
             id: generateId(),
+            trackingId: getNextSubtaskTrackingId(),
             label: data.label,
-            completed: false,
+            description: data.description,
+            completed: data.status === 'completed',
+            status: data.status || 'todo',
+            priority: data.priority || 'medium',
             assigneeId: data.assigneeId,
             avatar: assignee?.avatar || '',
+            assignees: assignees,
+            dueDate: data.dueDate,
+            attachments: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
           }
           return {
             ...task,
@@ -173,7 +226,12 @@ export function TaskProvider({ children }: { children: ReactNode }) {
           return {
             ...task,
             subtasks: task.subtasks?.map((st) =>
-              st.id === subtaskId ? { ...st, completed: !st.completed } : st
+              st.id === subtaskId ? {
+                ...st,
+                completed: !st.completed,
+                status: !st.completed ? 'completed' : 'todo',
+                updatedAt: new Date()
+              } : st
             ),
             updatedAt: new Date(),
           }
@@ -211,7 +269,120 @@ export function TaskProvider({ children }: { children: ReactNode }) {
           return {
             ...task,
             subtasks: task.subtasks?.map((st) =>
-              st.id === subtaskId ? { ...st, assigneeId, avatar } : st
+              st.id === subtaskId ? { ...st, assigneeId, avatar, updatedAt: new Date() } : st
+            ),
+            updatedAt: new Date(),
+          }
+        }
+        return task
+      }),
+    }))
+  }
+
+  const updateSubtask = (taskId: string, subtaskId: string, data: Partial<Subtask>) => {
+    if (!currentProject) return
+
+    setAllTasks((prev) => ({
+      ...prev,
+      [currentProject.id]: prev[currentProject.id].map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            subtasks: task.subtasks?.map((st) =>
+              st.id === subtaskId ? { ...st, ...data, updatedAt: new Date() } : st
+            ),
+            updatedAt: new Date(),
+          }
+        }
+        return task
+      }),
+    }))
+  }
+
+  const updateSubtaskStatus = (taskId: string, subtaskId: string, status: TaskStatus) => {
+    if (!currentProject) return
+
+    setAllTasks((prev) => ({
+      ...prev,
+      [currentProject.id]: prev[currentProject.id].map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            subtasks: task.subtasks?.map((st) =>
+              st.id === subtaskId ? {
+                ...st,
+                status,
+                completed: status === 'completed',
+                updatedAt: new Date()
+              } : st
+            ),
+            updatedAt: new Date(),
+          }
+        }
+        return task
+      }),
+    }))
+  }
+
+  const updateSubtaskPriority = (taskId: string, subtaskId: string, priority: TaskPriority) => {
+    if (!currentProject) return
+
+    setAllTasks((prev) => ({
+      ...prev,
+      [currentProject.id]: prev[currentProject.id].map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            subtasks: task.subtasks?.map((st) =>
+              st.id === subtaskId ? { ...st, priority, updatedAt: new Date() } : st
+            ),
+            updatedAt: new Date(),
+          }
+        }
+        return task
+      }),
+    }))
+  }
+
+  const attachFileToSubtask = (taskId: string, subtaskId: string, file: AttachedFile) => {
+    if (!currentProject) return
+
+    setAllTasks((prev) => ({
+      ...prev,
+      [currentProject.id]: prev[currentProject.id].map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            subtasks: task.subtasks?.map((st) =>
+              st.id === subtaskId ? {
+                ...st,
+                attachments: [...(st.attachments || []), file],
+                updatedAt: new Date()
+              } : st
+            ),
+            updatedAt: new Date(),
+          }
+        }
+        return task
+      }),
+    }))
+  }
+
+  const removeFileFromSubtask = (taskId: string, subtaskId: string, fileId: string) => {
+    if (!currentProject) return
+
+    setAllTasks((prev) => ({
+      ...prev,
+      [currentProject.id]: prev[currentProject.id].map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            subtasks: task.subtasks?.map((st) =>
+              st.id === subtaskId ? {
+                ...st,
+                attachments: st.attachments?.filter(f => f.id !== fileId),
+                updatedAt: new Date()
+              } : st
             ),
             updatedAt: new Date(),
           }
@@ -329,7 +500,12 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         addSubtask,
         toggleSubtask,
         deleteSubtask,
+        updateSubtask,
+        updateSubtaskStatus,
+        updateSubtaskPriority,
         updateSubtaskAssignee,
+        attachFileToSubtask,
+        removeFileFromSubtask,
         addChecklistItem,
         toggleChecklistItem,
         deleteChecklistItem,

@@ -1,4 +1,4 @@
-import type { Task, RequiredFile, StageDocument } from '@/types'
+import type { Task, RequiredFile, StageDocument, TemplateStage } from '@/types'
 
 /**
  * Comprehensive Residential Interior Design Template
@@ -36,8 +36,8 @@ export const salesTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       role: 'Sales Manager',
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah'
     },
-    status: 'completed',
-    priority: 'high',
+    status: 'todo',
+    priority: 'low',
     stage: 'Sales',
     checklistItems: [
       { id: 'sl-1-1', label: 'Schedule consultation meeting', completed: true },
@@ -55,8 +55,8 @@ export const salesTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       role: 'Sales Executive',
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael'
     },
-    status: 'in-progress',
-    priority: 'high',
+    status: 'todo',
+    priority: 'low',
     stage: 'Sales',
     subtasks: [
       { id: 'st-1-1', label: 'Measure all room dimensions', completed: true, assigneeId: 'sales-2', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael' },
@@ -86,7 +86,7 @@ export const salesTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Sales',
     checklistItems: [
       { id: 'sl-2-1', label: 'Calculate design fee', completed: false },
@@ -105,7 +105,7 @@ export const salesTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Sales',
     subtasks: [
       { id: 'st-2-1', label: 'Document family composition', completed: false, assigneeId: 'sales-2', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael' },
@@ -123,7 +123,7 @@ export const salesTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Sales'
   },
   {
@@ -137,7 +137,7 @@ export const salesTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah'
     },
     status: 'todo',
-    priority: 'urgent',
+    priority: 'low',
     stage: 'Sales',
     checklistItems: [
       { id: 'sl-3-1', label: 'Review payment milestones', completed: false },
@@ -155,7 +155,7 @@ export const salesTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah'
     },
     status: 'todo',
-    priority: 'urgent',
+    priority: 'low',
     stage: 'Sales',
     attachments: [
       {
@@ -180,7 +180,7 @@ export const salesTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Sales',
     subtasks: [
       { id: 'st-3-1', label: 'Compile all client documents', completed: false, assigneeId: 'sales-2', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael' },
@@ -213,7 +213,7 @@ export const salesTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Sales',
     checklistItems: [
       { id: 'sl-4-1', label: 'Collect client ID and address proof', completed: false },
@@ -238,8 +238,8 @@ export const designTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       role: 'Lead Designer',
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma'
     },
-    status: 'in-progress',
-    priority: 'high',
+    status: 'todo',
+    priority: 'low',
     stage: 'Design',
     subtasks: [
       { id: 'dt-1-1', label: 'Research design styles', completed: true, assigneeId: 'des-1', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma' },
@@ -257,8 +257,8 @@ export const designTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       role: 'Interior Designer',
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Liam'
     },
-    status: 'in-progress',
-    priority: 'high',
+    status: 'todo',
+    priority: 'low',
     stage: 'Design',
     attachments: [
       {
@@ -297,7 +297,7 @@ export const designTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Design'
   },
   {
@@ -311,7 +311,7 @@ export const designTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Liam'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Design',
     subtasks: [
       { id: 'dt-2-1', label: 'Create scaled floor plans', completed: false, assigneeId: 'des-2', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Liam' },
@@ -329,7 +329,7 @@ export const designTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Design',
     checklistItems: [
       { id: 'ds-2-1', label: 'Living room seating', completed: false },
@@ -348,7 +348,7 @@ export const designTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Liam'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Design',
     subtasks: [
       { id: 'dt-3-1', label: 'Plan ambient lighting', completed: false, assigneeId: 'des-2', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Liam' },
@@ -367,7 +367,7 @@ export const designTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Design',
     attachments: [
       {
@@ -392,7 +392,7 @@ export const designTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Liam'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Design',
     checklistItems: [
       { id: 'ds-3-1', label: 'Living room views', completed: false },
@@ -425,7 +425,7 @@ export const designTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma'
     },
     status: 'todo',
-    priority: 'urgent',
+    priority: 'low',
     stage: 'Design',
     subtasks: [
       { id: 'dt-4-1', label: 'Prepare presentation deck', completed: false, assigneeId: 'des-1', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma' },
@@ -450,8 +450,8 @@ export const technicalDesignTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[
       role: 'Technical Designer',
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=David'
     },
-    status: 'in-progress',
-    priority: 'high',
+    status: 'todo',
+    priority: 'low',
     stage: 'Technical Design',
     subtasks: [
       { id: 'tt-1-1', label: 'Floor plans with dimensions', completed: true, assigneeId: 'tech-1', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=David' },
@@ -470,7 +470,7 @@ export const technicalDesignTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rachel'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Technical Design',
     checklistItems: [
       { id: 'td-1-1', label: 'Light fixture positions', completed: false },
@@ -500,7 +500,7 @@ export const technicalDesignTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rachel'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Technical Design',
     subtasks: [
       { id: 'tt-2-1', label: 'Kitchen plumbing plan', completed: false, assigneeId: 'tech-2', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rachel' },
@@ -518,7 +518,7 @@ export const technicalDesignTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=David'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Technical Design',
     checklistItems: [
       { id: 'td-2-1', label: 'Kitchen cabinets', completed: false },
@@ -537,7 +537,7 @@ export const technicalDesignTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=David'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Technical Design'
   },
   {
@@ -565,7 +565,7 @@ export const technicalDesignTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=David'
     },
     status: 'todo',
-    priority: 'urgent',
+    priority: 'low',
     stage: 'Technical Design',
     subtasks: [
       { id: 'tt-3-1', label: 'Coordinate all drawings', completed: false, assigneeId: 'tech-1', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=David' },
@@ -584,7 +584,7 @@ export const technicalDesignTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rachel'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Technical Design',
     attachments: [
       {
@@ -609,7 +609,7 @@ export const technicalDesignTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=David'
     },
     status: 'todo',
-    priority: 'urgent',
+    priority: 'low',
     stage: 'Technical Design',
     checklistItems: [
       { id: 'td-3-1', label: 'Client sign-off', completed: false },
@@ -633,8 +633,8 @@ export const procurementTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = 
       role: 'Procurement Manager',
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jennifer'
     },
-    status: 'in-progress',
-    priority: 'high',
+    status: 'todo',
+    priority: 'low',
     stage: 'Procurement',
     subtasks: [
       { id: 'pt-1-1', label: 'Extract items from drawings', completed: true, assigneeId: 'proc-1', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jennifer' },
@@ -664,7 +664,7 @@ export const procurementTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = 
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmed'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Procurement',
     checklistItems: [
       { id: 'pr-1-1', label: 'Furniture suppliers', completed: false },
@@ -683,7 +683,7 @@ export const procurementTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = 
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jennifer'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Procurement',
     subtasks: [
       { id: 'pt-2-1', label: 'Prepare RFQ documents', completed: false, assigneeId: 'proc-1', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jennifer' },
@@ -701,7 +701,7 @@ export const procurementTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = 
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmed'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Procurement',
     checklistItems: [
       { id: 'pr-2-1', label: 'Create comparison sheet', completed: false },
@@ -719,7 +719,7 @@ export const procurementTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = 
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmed'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Procurement',
     attachments: [
       {
@@ -744,7 +744,7 @@ export const procurementTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = 
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jennifer'
     },
     status: 'todo',
-    priority: 'urgent',
+    priority: 'low',
     stage: 'Procurement',
     subtasks: [
       { id: 'pt-3-1', label: 'Negotiate pricing', completed: false, assigneeId: 'proc-1', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jennifer' },
@@ -763,7 +763,7 @@ export const procurementTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = 
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmed'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Procurement',
     checklistItems: [
       { id: 'pr-3-1', label: 'Generate PO documents', completed: false },
@@ -782,7 +782,7 @@ export const procurementTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = 
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jennifer'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Procurement'
   },
   {
@@ -796,7 +796,7 @@ export const procurementTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = 
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmed'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Procurement',
     subtasks: [
       { id: 'pt-4-1', label: 'Coordinate with vendors', completed: false, assigneeId: 'proc-2', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmed' },
@@ -834,8 +834,8 @@ export const productionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       role: 'Production Manager',
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos'
     },
-    status: 'in-progress',
-    priority: 'high',
+    status: 'todo',
+    priority: 'low',
     stage: 'Production',
     subtasks: [
       { id: 'prt-1-1', label: 'Kitchen cabinet manufacturing', completed: true, assigneeId: 'prod-1', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos' },
@@ -859,7 +859,7 @@ export const productionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nina'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Production',
     subtasks: [
       { id: 'prt-2-1', label: 'Fabric cutting and preparation', completed: false, assigneeId: 'prod-2', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nina' },
@@ -877,7 +877,7 @@ export const productionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Production',
     attachments: [
       {
@@ -902,7 +902,7 @@ export const productionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nina'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Production',
     checklistItems: [
       { id: 'pd-2-1', label: 'Dimensional accuracy', completed: false },
@@ -921,7 +921,7 @@ export const productionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Production'
   },
   {
@@ -960,7 +960,7 @@ export const productionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Production',
     checklistItems: [
       { id: 'pd-3-1', label: 'Foam padding applied', completed: false },
@@ -978,7 +978,7 @@ export const productionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nina'
     },
     status: 'todo',
-    priority: 'urgent',
+    priority: 'low',
     stage: 'Production',
     subtasks: [
       { id: 'prt-3-1', label: 'Verify against BOM', completed: false, assigneeId: 'prod-2', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nina' },
@@ -1003,8 +1003,8 @@ export const executionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       role: 'Site Supervisor',
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus'
     },
-    status: 'in-progress',
-    priority: 'high',
+    status: 'todo',
+    priority: 'low',
     stage: 'Execution',
     checklistItems: [
       { id: 'ex-1-1', label: 'Floor protection installed', completed: true },
@@ -1023,7 +1023,7 @@ export const executionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Execution',
     subtasks: [
       { id: 'et-1-1', label: 'Conduit installation', completed: false, assigneeId: 'exec-2', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya' },
@@ -1041,7 +1041,7 @@ export const executionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Execution',
     checklistItems: [
       { id: 'ex-2-1', label: 'Water supply lines', completed: false },
@@ -1059,7 +1059,7 @@ export const executionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Execution',
     subtasks: [
       { id: 'et-2-1', label: 'Grid framework installation', completed: false, assigneeId: 'exec-1', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus' },
@@ -1089,7 +1089,7 @@ export const executionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Execution',
     checklistItems: [
       { id: 'ex-3-1', label: 'Surface preparation', completed: false },
@@ -1108,7 +1108,7 @@ export const executionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Execution'
   },
   {
@@ -1122,7 +1122,7 @@ export const executionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus'
     },
     status: 'todo',
-    priority: 'urgent',
+    priority: 'low',
     stage: 'Execution',
     subtasks: [
       { id: 'et-3-1', label: 'Kitchen cabinets', completed: false, assigneeId: 'exec-1', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus' },
@@ -1141,7 +1141,7 @@ export const executionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Execution',
     checklistItems: [
       { id: 'ex-4-1', label: 'Decorative fixtures', completed: false },
@@ -1160,7 +1160,7 @@ export const executionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Execution',
     subtasks: [
       { id: 'et-4-1', label: 'Furniture delivery coordination', completed: false, assigneeId: 'exec-1', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus' },
@@ -1178,7 +1178,7 @@ export const executionTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>[] = [
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Execution',
     checklistItems: [
       { id: 'ex-5-1', label: 'Deep cleaning all areas', completed: false },
@@ -1204,7 +1204,7 @@ export const postInstallationTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus'
     },
     status: 'todo',
-    priority: 'urgent',
+    priority: 'low',
     stage: 'Post Installation',
     checklistItems: [
       { id: 'pi-1-1', label: 'Finish quality check', completed: false },
@@ -1223,7 +1223,7 @@ export const postInstallationTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Post Installation',
     subtasks: [
       { id: 'pt-1-1', label: 'Room-by-room inspection', completed: false, assigneeId: 'exec-1', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus' },
@@ -1253,7 +1253,7 @@ export const postInstallationTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus'
     },
     status: 'todo',
-    priority: 'high',
+    priority: 'low',
     stage: 'Post Installation'
   },
   {
@@ -1267,7 +1267,7 @@ export const postInstallationTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma'
     },
     status: 'todo',
-    priority: 'urgent',
+    priority: 'low',
     stage: 'Post Installation',
     checklistItems: [
       { id: 'pi-2-1', label: 'Schedule walkthrough', completed: false },
@@ -1304,7 +1304,7 @@ export const postInstallationTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jennifer'
     },
     status: 'todo',
-    priority: 'medium',
+    priority: 'low',
     stage: 'Post Installation',
     attachments: [
       {
@@ -1343,7 +1343,7 @@ export const postInstallationTasks: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah'
     },
     status: 'todo',
-    priority: 'urgent',
+    priority: 'low',
     stage: 'Post Installation',
     checklistItems: [
       { id: 'pi-3-1', label: 'All documents compiled', completed: false },
@@ -1455,7 +1455,8 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
     stage: 'Sales',
     status: 'pending',
     uploadDate: null,
-    description: 'Formal design services agreement with client'
+    description: 'Formal design services agreement with client',
+    requiredForProgression: true
   },
   {
     title: 'Client Onboarding Checklist',
@@ -1473,7 +1474,8 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
     status: 'approved',
     uploadDate: daysFromNow(-3),
     fileUrl: '#',
-    description: 'Detailed project proposal with scope and budget'
+    description: 'Detailed project proposal with scope and budget',
+    requiredForProgression: true
   },
   {
     title: 'Site Survey Report',
@@ -1501,7 +1503,8 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
     status: 'uploaded',
     uploadDate: daysFromNow(-1),
     fileUrl: '#',
-    description: 'Complete design concept presentation for client'
+    description: 'Complete design concept presentation for client',
+    requiredForProgression: true
   },
   {
     title: 'Material Specifications',
@@ -1526,7 +1529,8 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
     stage: 'Design',
     status: 'pending',
     uploadDate: null,
-    description: 'Client sign-off on final design'
+    description: 'Client sign-off on final design',
+    requiredForProgression: true
   },
   {
     title: 'Design Development Report',
@@ -1544,7 +1548,8 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
     stage: 'Technical Design',
     status: 'pending',
     uploadDate: null,
-    description: 'Complete set of construction drawings'
+    description: 'Complete set of construction drawings',
+    requiredForProgression: true
   },
   {
     title: 'MEP Coordination Report',
@@ -1568,7 +1573,8 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
     stage: 'Technical Design',
     status: 'pending',
     uploadDate: null,
-    description: 'Checklist for drawing approvals'
+    description: 'Checklist for drawing approvals',
+    requiredForProgression: true
   },
 
   // Procurement Stage Documents
@@ -1587,7 +1593,8 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
     stage: 'Procurement',
     status: 'pending',
     uploadDate: null,
-    description: 'Contracts with selected vendors'
+    description: 'Contracts with selected vendors',
+    requiredForProgression: true
   },
   {
     title: 'Purchase Order Register',
@@ -1611,7 +1618,8 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
     stage: 'Procurement',
     status: 'pending',
     uploadDate: null,
-    description: 'Client approval of material samples'
+    description: 'Client approval of material samples',
+    requiredForProgression: true
   },
 
   // Production Stage Documents
@@ -1629,7 +1637,8 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
     stage: 'Production',
     status: 'pending',
     uploadDate: null,
-    description: 'QC checklist for manufactured items'
+    description: 'QC checklist for manufactured items',
+    requiredForProgression: true
   },
   {
     title: 'Production Progress Report',
@@ -1664,7 +1673,8 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
     stage: 'Execution',
     status: 'pending',
     uploadDate: null,
-    description: 'Checklist for installation activities'
+    description: 'Checklist for installation activities',
+    requiredForProgression: true
   },
   {
     title: 'Daily Site Report',
@@ -1681,7 +1691,8 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
     stage: 'Execution',
     status: 'pending',
     uploadDate: null,
-    description: 'Site safety compliance documentation'
+    description: 'Site safety compliance documentation',
+    requiredForProgression: true
   },
   {
     title: 'Material Receipt Log',
@@ -1707,7 +1718,8 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
     stage: 'Post Installation',
     status: 'pending',
     uploadDate: null,
-    description: 'Final quality inspection report'
+    description: 'Final quality inspection report',
+    requiredForProgression: true
   },
   {
     title: 'Handover Certificate',
@@ -1715,7 +1727,8 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
     stage: 'Post Installation',
     status: 'pending',
     uploadDate: null,
-    description: 'Official project handover certificate'
+    description: 'Official project handover certificate',
+    requiredForProgression: true
   },
   {
     title: 'Warranty Documentation',
@@ -1744,6 +1757,76 @@ export const stageDocuments: Omit<StageDocument, 'id'>[] = [
 ]
 
 // ============================================================================
+// STAGE CONFIGURATION
+// ============================================================================
+
+export const templateStages: TemplateStage[] = [
+  {
+    stage: 'Sales',
+    status: 'todo',
+    priority: 'low',
+    startDate: null,
+    dueDate: '14', // Days from project start
+    departmentHeadRole: 'Sales Manager',
+    notes: 'Initial client engagement and contract finalization'
+  },
+  {
+    stage: 'Design',
+    status: 'todo',
+    priority: 'low',
+    startDate: null,
+    dueDate: '35', // 21 days for design phase
+    departmentHeadRole: 'Designer',
+    notes: 'Creative design development and client approvals'
+  },
+  {
+    stage: 'Technical Design',
+    status: 'todo',
+    priority: 'low',
+    startDate: null,
+    dueDate: '56', // 21 days for technical design
+    departmentHeadRole: 'Technical Designer',
+    notes: 'Technical drawings and construction documentation'
+  },
+  {
+    stage: 'Procurement',
+    status: 'todo',
+    priority: 'low',
+    startDate: null,
+    dueDate: '77', // 21 days for procurement
+    departmentHeadRole: 'Procurement Manager',
+    notes: 'Material sourcing and vendor management'
+  },
+  {
+    stage: 'Production',
+    status: 'todo',
+    priority: 'low',
+    startDate: null,
+    dueDate: '105', // 28 days for production
+    departmentHeadRole: 'Production Manager',
+    notes: 'Manufacturing and quality control'
+  },
+  {
+    stage: 'Execution',
+    status: 'todo',
+    priority: 'low',
+    startDate: null,
+    dueDate: '140', // 35 days for execution
+    departmentHeadRole: 'Site Supervisor',
+    notes: 'On-site installation and implementation'
+  },
+  {
+    stage: 'Post Installation',
+    status: 'todo',
+    priority: 'low',
+    startDate: null,
+    dueDate: '154', // 14 days for post installation
+    departmentHeadRole: 'Project Manager',
+    notes: 'Final inspections, handover, and client training'
+  }
+]
+
+// ============================================================================
 // TEMPLATE EXPORT
 // ============================================================================
 
@@ -1761,7 +1844,8 @@ export const residentialTemplate = {
     'Post Installation': postInstallationTasks
   },
   requiredFiles,
-  stageDocuments
+  stageDocuments,
+  stages: templateStages
 }
 
 export default residentialTemplate

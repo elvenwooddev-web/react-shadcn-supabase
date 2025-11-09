@@ -10,21 +10,21 @@ export function WorkflowPage() {
 
   if (!currentProject) {
     return (
-      <main className="flex-1 p-6 lg:p-8 flex items-center justify-center">
+      <main className="flex-1 p-6 lg:p-8 bg-background flex items-center justify-center">
         <p className="text-muted-foreground">No project selected</p>
       </main>
     )
   }
 
   return (
-    <main className="flex-1 p-6 lg:p-8">
+    <main className="flex-1 p-6 lg:p-8 bg-background">
       {/* Page Header */}
       <div className="flex flex-wrap justify-between gap-4 items-center mb-6">
         <div className="flex min-w-72 flex-col gap-1">
-          <p className="text-slate-900 dark:text-slate-50 text-3xl font-black leading-tight tracking-[-0.03em]">
+          <p className="text-foreground text-3xl font-black leading-tight tracking-[-0.03em]">
             {currentProject.name} - {currentProject.projectType}
           </p>
-          <p className="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal">
+          <p className="text-muted-foreground text-base font-normal leading-normal">
             Client: {currentProject.clientName} | Project ID: {currentProject.id.substring(0, 8)}
           </p>
         </div>

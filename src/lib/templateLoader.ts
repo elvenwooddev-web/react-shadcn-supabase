@@ -1,36 +1,36 @@
-import type { Task, RequiredFile, StageDocument, TeamMember } from '@/types'
+import type { Task, RequiredFile, StageDocument, TeamMember, TemplateStage } from '@/types'
 import { generateId } from '@/lib/helpers'
 import { residentialTemplate } from '@/data/templates/residentialTemplate'
-import { retailTemplate } from '@/data/templates/retailTemplate'
 
 /**
  * Template Loading System
  *
  * This module provides functionality to initialize new projects with pre-defined template data.
- * It loads tasks, files, and documents from template definitions and generates new IDs for all items.
+ * It loads tasks, files, documents, and stage configuration from template definitions.
  */
 
 export interface TemplateData {
   tasks: Task[]
   files: RequiredFile[]
   documents: StageDocument[]
+  stages?: TemplateStage[]
 }
 
 /**
  * Load a template and prepare it for a new project
  *
- * @param templateType - The type of template to load ('residential' or 'retail')
+ * @param templateType - The type of template to load (currently only 'residential')
  * @param projectId - The ID of the project to load the template for
  * @param teamMembers - Array of team members to assign tasks to
  * @returns Object containing tasks, files, and documents with new IDs
  */
 export function loadTemplate(
-  templateType: 'residential' | 'retail',
+  templateType: 'residential',
   _projectId: string,
   teamMembers: TeamMember[]
 ): TemplateData {
-  // Select the appropriate template
-  const template = templateType === 'residential' ? residentialTemplate : retailTemplate
+  // Use residential template
+  const template = residentialTemplate
 
   // Generate tasks with new IDs and assign team members
   const tasks = generateTasksFromTemplate(template.tasks, teamMembers)
@@ -41,10 +41,14 @@ export function loadTemplate(
   // Generate documents with new IDs
   const documents = generateDocumentsFromTemplate(template.stageDocuments)
 
+  // Get stage configuration from template (if available)
+  const stages = template.stages
+
   return {
     tasks,
     files,
     documents,
+    stages,
   }
 }
 
@@ -169,8 +173,8 @@ function assignTeamMemberToTask(
 /**
  * Get template metadata
  */
-export function getTemplateInfo(templateType: 'residential' | 'retail') {
-  const template = templateType === 'residential' ? residentialTemplate : retailTemplate
+export function getTemplateInfo(templateType: 'residential') {
+  const template = residentialTemplate
 
   return {
     name: template.name,

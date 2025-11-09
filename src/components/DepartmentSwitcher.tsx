@@ -21,7 +21,7 @@ export function DepartmentSwitcher() {
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg p-4 max-w-sm">
+      <div className="bg-card border border-border rounded-xl shadow-lg p-4 max-w-sm">
         <div className="flex items-center gap-2 mb-3">
           <Users className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm">Switch Department</h3>
@@ -49,7 +49,7 @@ export function DepartmentSwitcher() {
           ))}
         </div>
 
-        <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
+        <div className="pt-3 border-t border-border">
           <p className="text-xs text-muted-foreground">
             <span className="font-medium">Current:</span> {currentUser.name}
           </p>

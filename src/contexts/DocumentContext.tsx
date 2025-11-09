@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
-import type { StageDocument } from '@/types'
+import type { StageDocument, WorkflowStage } from '@/types'
 import { generateId, saveToLocalStorage, loadFromLocalStorage } from '@/lib/helpers'
 import { useProjects } from './ProjectContext'
 import { useUser } from './UserContext'
@@ -10,6 +10,9 @@ interface DocumentContextType {
   uploadDocument: (doc: Omit<StageDocument, 'id'>) => void
   updateDocumentStatus: (id: string, status: StageDocument['status']) => void
   deleteDocument: (id: string) => void
+  getRequiredDocumentsForStage: (stage: WorkflowStage) => StageDocument[]
+  getApprovedRequiredDocuments: (stage: WorkflowStage) => number
+  getTotalRequiredDocuments: (stage: WorkflowStage) => number
 }
 
 const DocumentContext = createContext<DocumentContextType | undefined>(undefined)
@@ -68,8 +71,32 @@ export function DocumentProvider({ children }: { children: ReactNode }) {
     }))
   }
 
+  const getRequiredDocumentsForStage = (stage: WorkflowStage): StageDocument[] => {
+    return allProjectDocs.filter((doc) => doc.stage === stage && doc.requiredForProgression === true)
+  }
+
+  const getApprovedRequiredDocuments = (stage: WorkflowStage): number => {
+    return allProjectDocs.filter(
+      (doc) => doc.stage === stage && doc.requiredForProgression === true && doc.status === 'approved'
+    ).length
+  }
+
+  const getTotalRequiredDocuments = (stage: WorkflowStage): number => {
+    return allProjectDocs.filter((doc) => doc.stage === stage && doc.requiredForProgression === true).length
+  }
+
   return (
-    <DocumentContext.Provider value={{ documents, uploadDocument, updateDocumentStatus, deleteDocument }}>
+    <DocumentContext.Provider
+      value={{
+        documents,
+        uploadDocument,
+        updateDocumentStatus,
+        deleteDocument,
+        getRequiredDocumentsForStage,
+        getApprovedRequiredDocuments,
+        getTotalRequiredDocuments,
+      }}
+    >
       {children}
     </DocumentContext.Provider>
   )

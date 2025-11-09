@@ -1,10 +1,15 @@
 import { NavLink, Link } from 'react-router-dom'
-import { LayoutGrid, Network, FolderOpen, MessageSquare, HelpCircle, Home, BarChart3, Users, Settings, User } from 'lucide-react'
+import { LayoutGrid, Network, FolderOpen, MessageSquare, HelpCircle, Home, BarChart3, Users, Settings, User, FileText, AlertTriangle } from 'lucide-react'
 import { useProjects } from '@/contexts/ProjectContext'
+import { useIssues } from '@/contexts/IssueContext'
 import { cn } from '@/lib/utils'
+import { ThemeSwitcher } from '@/components/ThemeSwitcher'
+import { Badge } from '@/components/ui/badge'
 
 export function LeftSidebar() {
   const { currentProject } = useProjects()
+  const { getOpenIssuesCount } = useIssues()
+  const openIssuesCount = getOpenIssuesCount()
 
   const navItems = [
     { to: 'workflow', icon: Network, label: 'Workflow' },
@@ -12,7 +17,7 @@ export function LeftSidebar() {
   ]
 
   return (
-    <aside className="flex h-full min-h-screen w-60 flex-col justify-between bg-white dark:bg-[#101c22] p-4 border-r border-slate-200 dark:border-slate-800">
+    <aside className="flex h-full min-h-screen w-60 flex-col justify-between bg-card p-4 border-r border-border">
       <div className="flex flex-col gap-4">
         {/* App Logo / Project Info */}
         {currentProject ? (
@@ -22,10 +27,10 @@ export function LeftSidebar() {
               style={{ backgroundImage: `url("${currentProject.logo}")` }}
             />
             <div className="flex flex-col min-w-0">
-              <h1 className="text-slate-900 dark:text-slate-50 text-sm font-medium leading-normal truncate">
+              <h1 className="text-foreground text-sm font-medium leading-normal truncate">
                 {currentProject.name}
               </h1>
-              <p className="text-slate-500 dark:text-slate-400 text-xs font-normal leading-normal">
+              <p className="text-muted-foreground text-xs font-normal leading-normal">
                 Project Management
               </p>
             </div>
@@ -43,10 +48,10 @@ export function LeftSidebar() {
               </svg>
             </div>
             <div className="flex flex-col min-w-0">
-              <h1 className="text-slate-900 dark:text-slate-50 text-base font-bold leading-normal truncate">
+              <h1 className="text-foreground text-base font-bold leading-normal truncate">
                 InteriorsFlow
               </h1>
-              <p className="text-slate-500 dark:text-slate-400 text-xs font-normal leading-normal">
+              <p className="text-muted-foreground text-xs font-normal leading-normal">
                 Project Management
               </p>
             </div>
@@ -60,25 +65,46 @@ export function LeftSidebar() {
             <>
               <a
                 href="#"
-                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
               >
-                <BarChart3 className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                <BarChart3 className="h-5 w-5 text-muted-foreground" />
                 <span className="text-sm font-medium">Dashboard</span>
               </a>
 
               <Link
                 to="/"
-                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
               >
-                <Home className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                <Home className="h-5 w-5 text-muted-foreground" />
                 <span className="text-sm font-medium">All Projects</span>
+              </Link>
+
+              <Link
+                to="/templates"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
+              >
+                <FileText className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm font-medium">Templates</span>
+              </Link>
+
+              <Link
+                to="/issues"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
+              >
+                <AlertTriangle className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm font-medium">Issues</span>
+                {openIssuesCount > 0 && (
+                  <Badge variant="destructive" className="ml-auto text-xs px-1.5 py-0.5 h-5">
+                    {openIssuesCount}
+                  </Badge>
+                )}
               </Link>
 
               <a
                 href="#"
-                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
               >
-                <Users className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                <Users className="h-5 w-5 text-muted-foreground" />
                 <span className="text-sm font-medium">Team Collab</span>
               </a>
             </>
@@ -87,13 +113,13 @@ export function LeftSidebar() {
             <>
               <Link
                 to="/"
-                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
               >
-                <Home className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                <Home className="h-5 w-5 text-muted-foreground" />
                 <span className="text-sm font-medium">All Projects</span>
               </Link>
 
-              <div className="h-px bg-slate-200 dark:border-slate-700 my-2" />
+              <div className="h-px bg-border my-2" />
 
               <NavLink
                 to="overview"
@@ -102,7 +128,7 @@ export function LeftSidebar() {
                     'flex items-center gap-3 px-3 py-2 rounded-lg',
                     isActive
                       ? 'bg-primary/20 dark:bg-primary/30'
-                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'
+                      : 'hover:bg-muted text-foreground'
                   )
                 }
               >
@@ -113,7 +139,7 @@ export function LeftSidebar() {
                         'h-5 w-5',
                         isActive
                           ? 'text-primary font-bold'
-                          : 'text-slate-600 dark:text-slate-400'
+                          : 'text-muted-foreground'
                       )}
                     />
                     <span
@@ -141,7 +167,7 @@ export function LeftSidebar() {
                         'flex items-center gap-3 px-3 py-2 rounded-lg',
                         isActive
                           ? 'bg-primary/20 dark:bg-primary/30'
-                          : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'
+                          : 'hover:bg-muted text-foreground'
                       )
                     }
                   >
@@ -152,7 +178,7 @@ export function LeftSidebar() {
                             'h-5 w-5',
                             isActive
                               ? 'text-primary font-bold'
-                              : 'text-slate-600 dark:text-slate-400'
+                              : 'text-muted-foreground'
                           )}
                         />
                         <span
@@ -171,6 +197,21 @@ export function LeftSidebar() {
                 )
               })}
 
+              <Link
+                to="/issues"
+                className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
+              >
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-sm font-medium">Issues</span>
+                </div>
+                {openIssuesCount > 0 && (
+                  <Badge variant="destructive" className="text-xs px-1.5 py-0.5 h-5">
+                    {openIssuesCount}
+                  </Badge>
+                )}
+              </Link>
+
               <NavLink
                 to="chat"
                 className={({ isActive }) =>
@@ -178,7 +219,7 @@ export function LeftSidebar() {
                     'flex items-center gap-3 px-3 py-2 rounded-lg',
                     isActive
                       ? 'bg-primary/20 dark:bg-primary/30'
-                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200'
+                      : 'hover:bg-muted text-foreground'
                   )
                 }
               >
@@ -189,7 +230,7 @@ export function LeftSidebar() {
                         'h-5 w-5',
                         isActive
                           ? 'text-primary font-bold'
-                          : 'text-slate-600 dark:text-slate-400'
+                          : 'text-muted-foreground'
                       )}
                     />
                     <span
@@ -212,31 +253,32 @@ export function LeftSidebar() {
 
       {/* Bottom Links */}
       <nav className="flex flex-col gap-1">
+        <ThemeSwitcher />
         {!currentProject ? (
           <>
             {/* All Projects Page - Settings, Profile */}
-            <a
-              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
-              href="#"
+            <Link
+              to="/settings"
+              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
             >
-              <Settings className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+              <Settings className="h-5 w-5 text-muted-foreground" />
               <span className="text-sm font-medium">Settings</span>
-            </a>
+            </Link>
             <a
-              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
+              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
               href="#"
             >
-              <User className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+              <User className="h-5 w-5 text-muted-foreground" />
               <span className="text-sm font-medium">Profile</span>
             </a>
           </>
         ) : (
           /* Project Page - Help */
           <a
-            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
             href="#"
           >
-            <HelpCircle className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+            <HelpCircle className="h-5 w-5 text-muted-foreground" />
             <span className="text-sm font-medium">Help</span>
           </a>
         )}
