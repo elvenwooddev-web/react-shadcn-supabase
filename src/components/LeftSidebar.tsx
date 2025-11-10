@@ -1,15 +1,27 @@
 import { NavLink, Link } from 'react-router-dom'
-import { LayoutGrid, Network, FolderOpen, MessageSquare, HelpCircle, Home, BarChart3, Users, Settings, User, FileText, AlertTriangle } from 'lucide-react'
+import { LayoutGrid, Network, FolderOpen, MessageSquare, HelpCircle, Home, BarChart3, Users, Settings, User, FileText, AlertTriangle, X, Shield, Settings2 } from 'lucide-react'
 import { useProjects } from '@/contexts/ProjectContext'
 import { useIssues } from '@/contexts/IssueContext'
+import { useApprovals } from '@/contexts/ApprovalContext'
+import { useUser } from '@/contexts/UserContext'
 import { cn } from '@/lib/utils'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
+import { DepartmentSwitcher } from '@/components/DepartmentSwitcher'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 
-export function LeftSidebar() {
+interface LeftSidebarProps {
+  isOpen?: boolean
+  onClose?: () => void
+}
+
+export function LeftSidebar({ isOpen = true, onClose }: LeftSidebarProps) {
   const { currentProject } = useProjects()
   const { getOpenIssuesCount } = useIssues()
+  const { getMyApprovals } = useApprovals()
+  const { currentUser } = useUser()
   const openIssuesCount = getOpenIssuesCount()
+  const myPendingApprovalsCount = currentUser ? getMyApprovals(currentUser.id).length : 0
 
   const navItems = [
     { to: 'workflow', icon: Network, label: 'Workflow' },
@@ -17,8 +29,37 @@ export function LeftSidebar() {
   ]
 
   return (
-    <aside className="flex h-full min-h-screen w-60 flex-col justify-between bg-card p-4 border-r border-border">
-      <div className="flex flex-col gap-4">
+    <>
+      {/* Mobile backdrop overlay */}
+      {isOpen && onClose && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "flex h-full min-h-screen w-60 flex-col justify-between bg-card p-4 border-r border-border transition-transform duration-300 ease-in-out",
+          "lg:translate-x-0 lg:static lg:z-auto",
+          "fixed left-0 top-0 z-50",
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* Mobile close button */}
+        {onClose && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="absolute top-4 right-4 lg:hidden"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        )}
+
+        <div className="flex flex-col gap-4">
         {/* App Logo / Project Info */}
         {currentProject ? (
           <div className="flex gap-3">
@@ -99,6 +140,28 @@ export function LeftSidebar() {
                   </Badge>
                 )}
               </Link>
+
+              <div className="space-y-1">
+                <Link
+                  to="/approvals"
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
+                >
+                  <Shield className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-sm font-medium">Approvals</span>
+                  {myPendingApprovalsCount > 0 && (
+                    <Badge className="ml-auto text-xs px-1.5 py-0.5 h-5 bg-warning/20 text-warning border-warning">
+                      {myPendingApprovalsCount}
+                    </Badge>
+                  )}
+                </Link>
+                <Link
+                  to="/approvals/settings"
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground ml-8"
+                >
+                  <Settings2 className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs font-medium">Approval Rules</span>
+                </Link>
+              </div>
 
               <a
                 href="#"
@@ -252,37 +315,43 @@ export function LeftSidebar() {
       </div>
 
       {/* Bottom Links */}
-      <nav className="flex flex-col gap-1">
-        <ThemeSwitcher />
-        {!currentProject ? (
-          <>
-            {/* All Projects Page - Settings, Profile */}
-            <Link
-              to="/settings"
-              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
-            >
-              <Settings className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm font-medium">Settings</span>
-            </Link>
+      <div className="flex flex-col">
+        <nav className="flex flex-col gap-1">
+          <ThemeSwitcher />
+          {!currentProject ? (
+            <>
+              {/* All Projects Page - Settings, Profile */}
+              <Link
+                to="/settings"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
+              >
+                <Settings className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm font-medium">Settings</span>
+              </Link>
+              <a
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
+                href="#"
+              >
+                <User className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm font-medium">Profile</span>
+              </a>
+            </>
+          ) : (
+            /* Project Page - Help */
             <a
               className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
               href="#"
             >
-              <User className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm font-medium">Profile</span>
+              <HelpCircle className="h-5 w-5 text-muted-foreground" />
+              <span className="text-sm font-medium">Help</span>
             </a>
-          </>
-        ) : (
-          /* Project Page - Help */
-          <a
-            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
-            href="#"
-          >
-            <HelpCircle className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm font-medium">Help</span>
-          </a>
-        )}
-      </nav>
-    </aside>
+          )}
+        </nav>
+
+        {/* Department Switcher - Demo Only */}
+        <DepartmentSwitcher />
+      </div>
+      </aside>
+    </>
   )
 }

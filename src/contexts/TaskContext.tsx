@@ -3,6 +3,7 @@ import type { Task, TaskContextType, CreateTaskForm, CreateSubtaskForm, Attached
 import { generateId, saveToLocalStorage, loadFromLocalStorage } from '@/lib/helpers'
 import { useProjects } from './ProjectContext'
 import { useUser } from './UserContext'
+import { useApprovalRules } from './ApprovalRuleContext'
 
 const initialTasks: Task[] = [
   {
@@ -82,6 +83,7 @@ const TaskContext = createContext<TaskContextType | undefined>(undefined)
 export function TaskProvider({ children }: { children: ReactNode }) {
   const { currentProject, getNextTaskTrackingId, getNextSubtaskTrackingId } = useProjects()
   const { canAccessStage } = useUser()
+  const { applyRulesToEntity } = useApprovalRules()
   const [allTasks, setAllTasks] = useState<Record<string, Task[]>>(() => {
     const loaded = loadFromLocalStorage('tasks', { p1: initialTasks })
 
@@ -140,6 +142,9 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       ...prev,
       [currentProject.id]: [...(prev[currentProject.id] || []), newTask],
     }))
+
+    // Apply approval rules to newly created task
+    applyRulesToEntity(newTask, currentProject.id)
   }
 
   const updateTask = (id: string, data: Partial<Task>) => {

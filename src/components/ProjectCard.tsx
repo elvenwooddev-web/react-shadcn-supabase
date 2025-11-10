@@ -1,5 +1,6 @@
-import { MouseEvent, useState } from 'react'
-import { MoreVertical, Edit, Archive } from 'lucide-react'
+import type { MouseEvent } from 'react'
+import { useState } from 'react'
+import { MoreVertical, Edit, Archive, Trash2 } from 'lucide-react'
 import type { Project } from '@/types'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -8,15 +9,18 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { EditProjectDialog } from '@/components/EditProjectDialog'
+import { DeleteProjectDialog } from '@/components/DeleteProjectDialog'
 
 interface ProjectCardProps {
   project: Project
   onProjectClick: (projectId: string) => void
   onEdit?: (project: Project) => void
   onArchive?: (projectId: string) => void
+  onDelete?: (projectId: string) => void
 }
 
 export function ProjectCard({
@@ -24,8 +28,10 @@ export function ProjectCard({
   onProjectClick,
   onEdit,
   onArchive,
+  onDelete,
 }: ProjectCardProps) {
   const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const handleCardClick = () => {
     onProjectClick(project.id)
@@ -43,6 +49,15 @@ export function ProjectCard({
   const handleArchive = (e: MouseEvent) => {
     e.stopPropagation()
     onArchive?.(project.id)
+  }
+
+  const handleDeleteClick = (e: MouseEvent) => {
+    e.stopPropagation()
+    setShowDeleteDialog(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    onDelete?.(project.id)
   }
 
   return (
@@ -83,6 +98,14 @@ export function ProjectCard({
                 <DropdownMenuItem onClick={handleArchive}>
                   <Archive className="h-4 w-4 mr-2" />
                   Archive
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleDeleteClick}
+                  className="text-danger focus:text-danger focus:bg-danger/10"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -148,6 +171,14 @@ export function ProjectCard({
           }}
         />
       )}
+
+      {/* Delete Dialog */}
+      <DeleteProjectDialog
+        project={project}
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleDeleteConfirm}
+      />
     </>
   )
 }

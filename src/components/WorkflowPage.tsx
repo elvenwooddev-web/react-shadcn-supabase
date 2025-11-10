@@ -59,19 +59,19 @@ export function WorkflowPage() {
   }
 
   return (
-    <main className="flex-1 p-6 lg:p-8 bg-background">
+    <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-background">
       {/* Page Header */}
-      <div className="flex flex-wrap justify-between gap-4 items-center mb-6">
-        <div className="flex min-w-72 flex-col gap-1">
-          <p className="text-foreground text-3xl font-black leading-tight tracking-[-0.03em]">
+      <div className="flex flex-col lg:flex-row lg:justify-between gap-4 items-start lg:items-center mb-6">
+        <div className="flex flex-col gap-1">
+          <p className="text-foreground text-xl sm:text-2xl lg:text-3xl font-black leading-tight tracking-[-0.03em]">
             {currentProject.name} - {currentProject.projectType}
           </p>
-          <p className="text-muted-foreground text-base font-normal leading-normal">
+          <p className="text-muted-foreground text-sm sm:text-base font-normal leading-normal">
             Client: {currentProject.clientName} | Project ID: {currentProject.id.substring(0, 8)}
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-success/20 text-success text-sm font-bold">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 w-full lg:w-auto">
+          <div className="flex items-center justify-center gap-2 rounded-lg h-10 px-3 sm:px-4 bg-success/20 text-success text-xs sm:text-sm font-bold">
             <CheckCircle className="h-4 w-4" />
             <span>{currentProject.status === 'active' ? 'On Track' : currentProject.status}</span>
           </div>

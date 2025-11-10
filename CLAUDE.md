@@ -29,34 +29,41 @@ npm run lint
 
 ### State Management Pattern
 
-The application uses **React Context API** with localStorage persistence. Nine main contexts manage global state:
+The application uses **React Context API** with localStorage persistence. Twelve main contexts manage global state:
 
-1. **UserContext** - Department-based role system (Admin, Sales, Design, Technical, Procurement, Production, Execution)
-2. **TemplateProvider** - Template CRUD for reusable project templates
-3. **ProjectContext** - Multi-project management with stage metadata initialization
-4. **TaskContext** - Tasks with enhanced subtasks (priority, status, attachments, multiple assignees)
-5. **FileContext** - Required files scoped by project and filtered by department
-6. **DocumentContext** - Stage documents with status tracking
-7. **TeamContext** - Team members and activity feed
-8. **StageContext** - Workflow stage metadata (status, priority, dates, department heads)
-9. **WorkflowRulesContext** - Validation rules for stage transitions, auto-assignment, approvals
+1. **StatusConfigProvider** - Custom status management for all entity types (tasks, issues, stages, etc.)
+2. **UserContext** - Department-based role system (Admin, Sales, Design, Technical, Procurement, Production, Execution)
+3. **TemplateProvider** - Template CRUD for reusable project templates
+4. **ProjectContext** - Multi-project management with stage metadata initialization
+5. **TeamContext** - Team members and activity feed
+6. **ApprovalProvider** - Approval request management (multi-level chains, approve/reject/delegate)
+7. **ApprovalRuleProvider** - Approval rule configuration (global + project-specific)
+8. **TaskContext** - Tasks with enhanced subtasks (priority, status, attachments, multiple assignees)
+9. **FileContext** - Required files scoped by project and filtered by department
+10. **DocumentContext** - Stage documents with status tracking
+11. **StageContext** - Workflow stage metadata (status, priority, dates, department heads)
+12. **WorkflowRulesContext** - Validation rules for stage transitions, auto-assignment, approvals
 
 **Critical**: Contexts MUST be nested in this order in App.tsx:
 ```
-UserProvider > TemplateProvider > ProjectProvider > TaskProvider > FileProvider >
-DocumentProvider > TeamProvider > StageProvider > WorkflowRulesProvider
+StatusConfigProvider > UserProvider > TemplateProvider > ProjectProvider > TeamProvider >
+ApprovalProvider > ApprovalRuleProvider > TaskProvider > FileProvider > DocumentProvider >
+IssueProvider > StageProvider > WorkflowRulesProvider
 ```
 
 **Context Dependencies**:
+- ApprovalProvider requires TeamProvider, ProjectProvider, UserProvider
+- ApprovalRuleProvider requires ApprovalProvider (uses useApprovals hook)
 - StageContext requires TaskProvider, FileProvider, DocumentProvider (for progress calculation)
-- WorkflowRulesContext requires all data contexts for validation
+- WorkflowRulesContext requires all data contexts for validation, including ApprovalProvider
+- TaskContext requires ApprovalRuleProvider for auto-applying approval rules on task creation
 - TaskContext, FileContext, DocumentContext call `useUser()` for department filtering
 
 ### Data Persistence
 
 All data persists to browser localStorage:
-- **Global**: `projects`, `currentUser`, `currentProject`, `projectTemplates`, `workflowRules`
-- **Project-scoped**: `tasks`, `files`, `documents`, `activities`, `stages`, `projectWorkflowRules`
+- **Global**: `projects`, `currentUser`, `currentProject`, `projectTemplates`, `workflowRules`, `approvalRules`, `statusConfigurations`
+- **Project-scoped**: `tasks`, `files`, `documents`, `activities`, `stages`, `projectWorkflowRules`, `projectApprovalRules`, `approvalRequests-{projectId}`
 - **Structure**: Project-scoped data keyed by project ID: `Record<string, T[]>`
 - **Auto-saves**: Every state change triggers useEffect localStorage sync
 - **Migration**: StageContext and TaskContext include migration logic for backwards compatibility
@@ -68,13 +75,17 @@ All data persists to browser localStorage:
 ├── /projects/new (NewProjectPage with template selector)
 ├── /templates (TemplatesListPage - browse/create/edit templates)
 ├── /templates/:id/edit (TemplateEditorPage - 3-tab editor: tasks/files/docs)
-├── /settings (SettingsPage - global workflow rules & preferences)
+├── /settings (SettingsPage - global workflow rules & status configuration)
+├── /issues (IssuesPage - issue tracking across projects)
+├── /approvals (ApprovalsPage - approval dashboard with stats)
+├── /approvals/settings (ApprovalsSettingsPage - global approval rules)
 └── /projects/:id (ProjectLayout with Header, LeftSidebar, RightSidebar)
     ├── /overview (ProjectOverviewPage - dashboard & stats)
     ├── /workflow (WorkflowPage - tasks with enhanced subtasks)
     ├── /files (FilesPage - files grouped by stage)
     ├── /chat (ChatPage - team messaging)
-    └── /settings (SettingsPage - project-specific workflow rules)
+    ├── /settings (SettingsPage - project-specific workflow rules)
+    └── /approvals/settings (ApprovalsSettingsPage - project approval rules)
 ```
 
 ### Template System
@@ -102,8 +113,9 @@ All data persists to browser localStorage:
 **Template Loading** (`src/lib/templateLoader.ts`):
 - Auto-loads residential template when creating projects
 - Generates unique IDs for all tasks, files, documents
-- Auto-assigns team members based on `STAGE_TO_DEPARTMENT` mapping
-- Injects into TaskContext, FileContext, DocumentContext via localStorage
+- Tasks/subtasks start **unassigned** (assignee: undefined) - project manager assigns manually
+- Generates approval requests from template approvals (8 workflows with source='template')
+- Injects into TaskContext, FileContext, DocumentContext, ApprovalContext via localStorage
 
 ### Workflow Stage System
 
@@ -366,5 +378,180 @@ Dark Mode (`src/index.css` lines 99-121):
 - Components: PascalCase (TaskCard.tsx)
 - Pages: PascalCase with Page suffix (ProjectsListPage.tsx)
 - Contexts: PascalCase with Context suffix (ProjectContext.tsx)
-- Utilities: camelCase (helpers.ts, templateLoader.ts)
+- Utilities: camelCase (helpers.ts, templateLoader.ts, ruleEvaluator.ts)
 - Types: index.ts (single source of truth)
+
+## Custom Status System
+
+**StatusConfigContext** (`src/contexts/StatusConfigContext.tsx`):
+- Centralized management of custom statuses for all entity types
+- **26 default statuses** across: tasks, subtasks, issues, stages, documents, files, projects
+- Status types changed from fixed unions to `string` for flexibility
+- CRUD operations: create, update, delete, reorder statuses
+- Workflow transitions: define allowed status changes
+- Auto-actions: trigger actions on status change (planned feature)
+
+**Status Configuration** (accessible via `/settings` → Status Configuration tab):
+- **7 entity type tabs**: Tasks, Subtasks, Issues, Stages, Documents, Files, Projects
+- **Drag-and-drop reordering** using @dnd-kit/core and @dnd-kit/sortable
+- **Color picker** with 12 preset colors + custom hex input (react-colorful)
+- **Icon picker** with 40+ curated Lucide icons
+- **Status badges** dynamically rendered with configured colors and icons
+- **Status selectors** (StatusSelector, StatusSelect) replace hardcoded dropdown options
+
+**Components**:
+- `src/components/ui/status-badge.tsx` - Dynamic badge rendering
+- `src/components/ui/status-selector.tsx` - Reusable status dropdown
+- `src/components/ui/color-picker.tsx` - Color selection with presets
+- `src/components/ui/icon-picker.tsx` - Searchable icon grid
+- `src/components/settings/StatusConfigTab.tsx` - Management UI
+- `src/components/settings/AddStatusDialog.tsx` - Status creation
+- `src/components/settings/EditStatusDialog.tsx` - Status editing
+
+**localStorage**: `statusConfigurations` (global, shared across all projects)
+
+## Multi-Level Approval System
+
+**Architecture**: 4-source approval system with template defaults, manual addition, global rules, and project-specific rules.
+
+### ApprovalContext (`src/contexts/ApprovalContext.tsx`)
+
+Manages approval request lifecycle:
+- **CRUD Operations**: create, update, approve, reject, delegate approval requests
+- **Sequential Chains**: Multi-level approvals (up to 3+ levels) with auto-progression
+- **Comment System**: Discussion threads on approvals
+- **Audit Trail**: Full history of all approval actions
+- **Delegation**: Reassign approvals to other team members
+- **Smart Assignment**: Auto-assigns approvers based on role (department heads, PM, admin, clients)
+
+**Key Methods**:
+- `approveRequest(id, comment?)` - Approve and auto-advance to next level
+- `rejectRequest(id, reason, comment?)` - Reject with reason (stops chain)
+- `delegateRequest(id, toUserId)` - Reassign to another user
+- `getPendingApprovals()`, `getMyApprovals(userId)`, `getApprovalsByStage(stage)`
+- `canApprove(requestId, userId)`, `getApprovalStatus(entityType, entityId)`
+
+### ApprovalRuleContext (`src/contexts/ApprovalRuleContext.tsx`)
+
+Manages approval rule configuration:
+- **Rule-Based Matching**: Smart matching via stages, priority, categories, title patterns (regex)
+- **Auto-Application**: Rules automatically create approval requests for matching items
+- **Scope Support**: Global rules (all projects) + Project-specific rules (overrides)
+- **Rule Evaluation**: `getMatchingRules(entity)`, `applyRulesToEntity(entity, projectId)`
+
+**Matching Criteria** (`ApprovalMatchingCriteria`):
+- `stages[]` - Match items in specific workflow stages
+- `priority[]` - Match tasks with specific priorities
+- `documentCategory[]` - Match documents by category
+- `titlePattern` - Regex pattern for title matching
+- `tags[]` - Future: tag-based matching
+
+### Approval Sources (4 Types)
+
+**1. Template Approvals** (source: 'template', 📋 blue badge):
+- Defined in template.approvals array
+- Auto-loaded when creating project from template
+- Residential template includes 8 workflows (18 individual configs)
+- Examples: Design stage client approval, Technical drawings 3-level chain, Quality inspection
+
+**2. Manual Approvals** (source: 'manual', ✋ orange badge):
+- "Require Approval" button on TaskCard
+- QuickAddApprovalDialog for quick configuration
+- One-off approval requests for specific items
+
+**3. Global Approval Rules** (source: 'global-rule', 🌐 purple badge):
+- Configured in `/approvals/settings`
+- Apply to all projects automatically
+- Auto-create approval requests for matching items
+- Examples: "All high-priority tasks need Admin approval"
+
+**4. Project Approval Rules** (source: 'project-rule', 📁 green badge):
+- Configured in `/projects/:id/approvals/settings`
+- Override global rules for specific project
+- Higher precedence than global rules
+
+### Approval Workflow Integration
+
+**Auto-Application** (TaskContext):
+```typescript
+createTask() → Auto-applies matching approval rules → Creates approval requests
+```
+
+**Stage Completion Validation** (WorkflowRulesContext):
+```typescript
+canCompleteStage() → Checks pending approvals → Blocks if approvals pending
+```
+
+**Stage Detail Dialog**:
+- Shows "Stage Approvals" section with pending/approved counts
+- Displays ApprovalsList component filtered by stage
+- Visual approval progress indicators
+
+### Approval Components
+
+**Core Components**:
+- `ApprovalRequestCard.tsx` - Rich display with chain progress, comments, history
+- `ApprovalActionDialog.tsx` - Unified approve/reject/delegate interface
+- `ApprovalBadge.tsx` - Status indicators with source badges
+- `ApprovalsList.tsx` - Filterable list with tabs (All/Pending/Approved/Rejected)
+- `QuickAddApprovalDialog.tsx` - Manual approval creation
+- `ApprovalsPage.tsx` - Dashboard with statistics
+- `ApprovalsSettingsPage.tsx` - Rule management (3 tabs: Rules/Statistics/Documentation)
+- `ApprovalRulesTab.tsx` - Rule display and management
+- `AddApprovalRuleDialog.tsx` - 2-step wizard for rule creation
+
+**Approval Request Fields**:
+- `source`, `ruleId`, `templateApprovalId` - Track origin
+- `currentApprovalLevel` - Position in sequential chain
+- `approvalConfigs[]` - Chain of approvers
+- `status`, `assignedTo`, `comments`, `history` - Lifecycle tracking
+
+**Residential Template Approvals** (`src/data/templates/residentialTemplate.ts`):
+- 8 approval workflows with 18 individual configs
+- Mix of 1-level, 2-level, and 3-level sequential chains
+- Covers tasks, documents, and stages
+- Examples: Client design approval, Technical drawings (tech→consultant→client), Quality inspection (execution→PM→client)
+
+### Approval Rule Matching (`src/lib/ruleEvaluator.ts`)
+
+Intelligent rule evaluation:
+- `matchesRule(entity, rule)` - Check if entity matches all criteria
+- `getMatchingRules(entity, allRules, entityType)` - Find applicable rules
+- `countRuleMatches(rule, entities)` - Preview rule impact
+- `validateCriteria(criteria)` - Form validation
+- `getCriteriaDescription(criteria)` - Human-readable rule description
+
+## Responsive Design
+
+**Breakpoints**:
+- Mobile: < 640px (sm)
+- Tablet: 640px - 1024px (md, lg)
+- Desktop: 1024px - 1280px (lg, xl)
+- Large Desktop: ≥ 1280px (xl+)
+
+**Mobile Optimizations**:
+- **Header**: Hamburger menu, hidden search bar (icon only), responsive spacing
+- **LeftSidebar**: Slide-out drawer with backdrop overlay, fixed positioning
+- **RightSidebar**: Hidden on screens < 1280px
+- **HomeSidebar**: Full width on mobile, stacks below content
+- **WorkflowProgress**: Horizontal scroll for 7 stages, smaller text/badges
+- **DepartmentSwitcher**: Compact sizing, positioned bottom-right
+
+**Layout Patterns**:
+- Use `flex-col lg:flex-row` for mobile→desktop transitions
+- Grid cols: `grid-cols-1 md:grid-cols-2 lg:grid-cols-4`
+- Padding: `p-4 sm:p-6 lg:p-8`
+- Text: `text-xl sm:text-2xl lg:text-3xl`
+
+## Project Deletion
+
+**DeleteProjectDialog** (`src/components/DeleteProjectDialog.tsx`):
+- Type-to-confirm deletion (must type exact project name)
+- Shows detailed project info before deletion
+- Multiple warnings about data loss
+- Integrated into ProjectCard, ProjectListView, ProjectTableView, ProjectKanbanView
+- Deletes all associated data: tasks, files, documents, activities, stages, workflow rules, approvals
+
+## Department Switcher (Demo/Testing Only)
+
+Located in sidebar, not fixed overlay. **For testing purposes only** - in production, department would be determined by user authentication. Allows switching between departments to test role-based access control without multiple logins.

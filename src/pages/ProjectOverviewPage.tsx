@@ -24,10 +24,10 @@ export function ProjectOverviewPage() {
   const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0
 
   return (
-    <main className="flex-1 p-6 lg:p-8 bg-background">
+    <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-background">
       <div className="mb-6">
-        <h1 className="text-3xl font-black text-foreground mb-2">{currentProject.name}</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-black text-foreground mb-2">{currentProject.name}</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           {currentProject.description} • {currentProject.clientName}
         </p>
       </div>

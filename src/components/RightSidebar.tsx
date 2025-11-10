@@ -24,7 +24,7 @@ export function RightSidebar() {
   }
 
   return (
-    <aside className="w-80 border-l border-border p-6 bg-card min-h-[calc(100vh-69px)]">
+    <aside className="hidden xl:block w-80 border-l border-border p-6 bg-card min-h-[calc(100vh-69px)]">
       <div className="space-y-6">
         {/* Project Details */}
         <div>

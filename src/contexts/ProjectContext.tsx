@@ -252,6 +252,11 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       saveToLocalStorage('tasks', existingTasks)
       saveToLocalStorage('files', existingFiles)
       saveToLocalStorage('documents', existingDocuments)
+
+      // Save approval requests if template has approvals configured
+      if (templateData.approvals && templateData.approvals.length > 0) {
+        saveToLocalStorage(`approvalRequests-${newProject.id}`, templateData.approvals)
+      }
     }
 
     setProjects((prev) => [...prev, newProject])

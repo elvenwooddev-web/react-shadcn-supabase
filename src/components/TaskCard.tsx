@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { PlusCircle, Download, X, FileText, Image, Paperclip, Upload, UserPlus, Calendar, AlertTriangle } from 'lucide-react'
+import { PlusCircle, Download, X, FileText, Image, Paperclip, Upload, UserPlus, Calendar, AlertTriangle, Shield } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -17,6 +17,8 @@ import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog'
 import { PriorityBadge } from '@/components/PriorityBadge'
 import { CreateIssueDialog } from '@/components/CreateIssueDialog'
 import { IssueIndicator } from '@/components/IssueIndicator'
+import { QuickAddApprovalDialog } from '@/components/QuickAddApprovalDialog'
+import { ApprovalBadge } from '@/components/ui/approval-badge'
 import type { Task, TaskStatus, TaskPriority, TeamMember } from '@/types'
 
 interface TaskCardProps {
@@ -32,6 +34,7 @@ export function TaskCard({ task }: TaskCardProps) {
   const [addingSubtaskTo, setAddingSubtaskTo] = useState(false)
   const [addingChecklistTo, setAddingChecklistTo] = useState(false)
   const [isCreateIssueOpen, setIsCreateIssueOpen] = useState(false)
+  const [isQuickAddApprovalOpen, setIsQuickAddApprovalOpen] = useState(false)
   const [issueSourceType, setIssueSourceType] = useState<'task' | 'subtask'>('task')
   const [issueSourceId, setIssueSourceId] = useState('')
   const [issueSubtaskId, setIssueSubtaskId] = useState<string | undefined>()
@@ -83,24 +86,30 @@ export function TaskCard({ task }: TaskCardProps) {
   }
 
   const handleAddAssignee = (member: TeamMember) => {
-    const currentAssignees = task.assignees || [task.assignee]
+    const currentAssignees = task.assignees || (task.assignee ? [task.assignee] : [])
     const isAlreadyAssigned = currentAssignees.some(a => a.id === member.id)
 
     if (!isAlreadyAssigned) {
       updateTask(task.id, {
+        assignee: currentAssignees.length === 0 ? member : task.assignee,
         assignees: [...currentAssignees, member]
       })
     }
   }
 
   const handleRemoveAssignee = (memberId: string) => {
-    const currentAssignees = task.assignees || [task.assignee]
+    const currentAssignees = task.assignees || (task.assignee ? [task.assignee] : [])
     const filtered = currentAssignees.filter(a => a.id !== memberId)
 
     if (filtered.length > 0) {
       updateTask(task.id, {
         assignee: filtered[0],
         assignees: filtered
+      })
+    } else {
+      updateTask(task.id, {
+        assignee: undefined,
+        assignees: []
       })
     }
   }
@@ -136,7 +145,7 @@ export function TaskCard({ task }: TaskCardProps) {
     }
   }
 
-  const displayAssignees = task.assignees || [task.assignee]
+  const displayAssignees = task.assignees || (task.assignee ? [task.assignee] : [])
 
   return (
     <div
@@ -168,6 +177,12 @@ export function TaskCard({ task }: TaskCardProps) {
                     size="sm"
                   />
                 )}
+                {/* Approval Badge */}
+                <ApprovalBadge
+                  entityType="task"
+                  entityId={task.id}
+                  size="sm"
+                />
               </div>
               <p className="font-medium text-foreground">
                 {task.title}
@@ -185,33 +200,50 @@ export function TaskCard({ task }: TaskCardProps) {
               {/* Assignees Popover */}
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-auto p-0 hover:opacity-80">
-                    <div className="flex -space-x-2">
-                      {displayAssignees.slice(0, 3).map((assignee, idx) => (
-                        <Avatar
-                          key={`${assignee.id}-${idx}`}
-                          src={assignee.avatar}
-                          className="size-6 ring-2 ring-card"
-                        />
-                      ))}
-                      {displayAssignees.length > 3 && (
-                        <div className="size-6 rounded-full bg-muted ring-2 ring-card flex items-center justify-center text-xs font-medium">
-                          +{displayAssignees.length - 3}
-                        </div>
-                      )}
-                    </div>
+                  <Button
+                    variant={displayAssignees.length === 0 ? "outline" : "ghost"}
+                    size="sm"
+                    className={displayAssignees.length === 0 ? "h-8 gap-1.5" : "h-auto p-0 hover:opacity-80"}
+                  >
+                    {displayAssignees.length === 0 ? (
+                      <>
+                        <UserPlus className="h-3.5 w-3.5" />
+                        <span className="text-xs">Assign</span>
+                      </>
+                    ) : (
+                      <div className="flex -space-x-2">
+                        {displayAssignees.slice(0, 3).map((assignee, idx) => (
+                          <Avatar
+                            key={`${assignee.id}-${idx}`}
+                            src={assignee.avatar}
+                            className="size-6 ring-2 ring-card"
+                          />
+                        ))}
+                        {displayAssignees.length > 3 && (
+                          <div className="size-6 rounded-full bg-muted ring-2 ring-card flex items-center justify-center text-xs font-medium">
+                            +{displayAssignees.length - 3}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-64 p-2">
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold mb-2">Assignees</p>
-                    {displayAssignees.map((assignee) => (
-                      <div key={assignee.id} className="flex items-center justify-between p-2 hover:bg-muted rounded-md">
-                        <div className="flex items-center gap-2">
-                          <Avatar src={assignee.avatar} className="size-6" />
-                          <span className="text-sm">{assignee.name}</span>
-                        </div>
-                        {displayAssignees.length > 1 && (
+                    <p className="text-sm font-semibold mb-2">
+                      {displayAssignees.length === 0 ? 'Assign Task' : 'Assignees'}
+                    </p>
+                    {displayAssignees.length === 0 ? (
+                      <p className="text-xs text-muted-foreground mb-2">
+                        Select team member(s) to assign this task:
+                      </p>
+                    ) : (
+                      displayAssignees.map((assignee) => (
+                        <div key={assignee.id} className="flex items-center justify-between p-2 hover:bg-muted rounded-md">
+                          <div className="flex items-center gap-2">
+                            <Avatar src={assignee.avatar} className="size-6" />
+                            <span className="text-sm">{assignee.name}</span>
+                          </div>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -220,26 +252,28 @@ export function TaskCard({ task }: TaskCardProps) {
                           >
                             <X className="h-3 w-3" />
                           </Button>
-                        )}
+                        </div>
+                      ))
+                    )}
+                    {displayAssignees.length > 0 && (
+                      <div className="border-t pt-2 mt-2">
+                        <p className="text-xs font-semibold mb-2 text-muted-foreground">Add More</p>
                       </div>
-                    ))}
-                    <div className="border-t pt-2 mt-2">
-                      <p className="text-xs font-semibold mb-2 text-muted-foreground">Add Assignee</p>
-                      {teamMembers
-                        .filter(m => !displayAssignees.some(a => a.id === m.id))
-                        .map((member) => (
-                          <Button
-                            key={member.id}
-                            variant="ghost"
-                            size="sm"
-                            className="w-full justify-start h-auto p-2"
-                            onClick={() => handleAddAssignee(member)}
-                          >
-                            <Avatar src={member.avatar} className="size-5 mr-2" />
-                            <span className="text-sm">{member.name}</span>
-                          </Button>
-                        ))}
-                    </div>
+                    )}
+                    {teamMembers
+                      .filter(m => !displayAssignees.some(a => a.id === m.id))
+                      .map((member) => (
+                        <Button
+                          key={member.id}
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start h-auto p-2"
+                          onClick={() => handleAddAssignee(member)}
+                        >
+                          <Avatar src={member.avatar} className="size-5 mr-2" />
+                          <span className="text-sm">{member.name}</span>
+                        </Button>
+                      ))}
                   </div>
                 </PopoverContent>
               </Popover>
@@ -781,6 +815,17 @@ export function TaskCard({ task }: TaskCardProps) {
             </Button>
           )}
 
+          {/* Require Approval Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsQuickAddApprovalOpen(true)}
+            className="text-xs text-muted-foreground hover:text-primary"
+          >
+            <Shield className="h-3 w-3 mr-1" />
+            Require Approval
+          </Button>
+
           {/* Hidden file input */}
           <input
             ref={fileInputRef}
@@ -802,6 +847,16 @@ export function TaskCard({ task }: TaskCardProps) {
         sourceTrackingId={issueSourceType === 'task' ? task.trackingId : task.subtasks?.find(s => s.id === issueSubtaskId)?.trackingId || ''}
         subtaskId={issueSubtaskId}
         subtaskTrackingId={issueSubtaskId ? task.subtasks?.find(s => s.id === issueSubtaskId)?.trackingId : undefined}
+      />
+
+      {/* Quick Add Approval Dialog */}
+      <QuickAddApprovalDialog
+        entityType="task"
+        entityId={task.id}
+        entityName={task.title}
+        stage={task.stage}
+        open={isQuickAddApprovalOpen}
+        onOpenChange={setIsQuickAddApprovalOpen}
       />
     </div>
   )

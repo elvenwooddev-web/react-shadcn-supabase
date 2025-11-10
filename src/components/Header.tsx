@@ -1,20 +1,36 @@
 import { useNavigate } from 'react-router-dom'
-import { Search, Bell, Settings, LayoutGrid } from 'lucide-react'
+import { Search, Bell, Settings, LayoutGrid, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Avatar } from '@/components/ui/avatar'
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick?: () => void
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const navigate = useNavigate()
 
   return (
-    <header className="flex items-center justify-between whitespace-nowrap border-b border-border px-6 py-3 bg-card sticky top-0 z-20">
-      <div className="flex items-center gap-8">
+    <header className="flex items-center justify-between whitespace-nowrap border-b border-border px-3 sm:px-6 py-3 bg-card sticky top-0 z-20">
+      <div className="flex items-center gap-2 sm:gap-8">
+        {/* Mobile menu button */}
+        {onMenuClick && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onMenuClick}
+            className="lg:hidden h-10 w-10"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        )}
+
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-3 text-foreground hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2 sm:gap-3 text-foreground hover:opacity-80 transition-opacity"
         >
-          <div className="size-6 text-primary">
+          <div className="size-5 sm:size-6 text-primary">
             <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
               <path
                 clipRule="evenodd"
@@ -24,7 +40,7 @@ export function Header() {
               />
             </svg>
           </div>
-          <h2 className="text-lg font-bold leading-tight tracking-[-0.015em]">
+          <h2 className="text-base sm:text-lg font-bold leading-tight tracking-[-0.015em]">
             InteriorsFlow
           </h2>
         </button>
@@ -32,14 +48,15 @@ export function Header() {
           variant="ghost"
           size="sm"
           onClick={() => navigate('/')}
-          className="text-muted-foreground"
+          className="text-muted-foreground hidden md:flex"
         >
           <LayoutGrid className="h-4 w-4 mr-2" />
           All Projects
         </Button>
       </div>
-      <div className="flex flex-1 justify-end gap-4">
-        <div className="flex w-full max-w-64">
+      <div className="flex flex-1 justify-end gap-2 sm:gap-4">
+        {/* Search bar - hidden on mobile */}
+        <div className="hidden md:flex w-full max-w-64">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -49,11 +66,19 @@ export function Header() {
             />
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1 sm:gap-2">
+          {/* Search button for mobile */}
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 bg-muted hover:bg-muted/80"
+            className="md:hidden h-10 w-10 bg-muted hover:bg-muted/80"
+          >
+            <Search className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10 bg-muted hover:bg-muted/80 hidden sm:flex"
           >
             <Bell className="h-5 w-5" />
           </Button>
@@ -69,6 +94,7 @@ export function Header() {
         <Avatar
           src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC4hZweZZ_Wklobk-DYU7efq-jsk22Zux2k4bgZ_o28lGcyRqXF7MSHUQAVJP_gg0ntdMGWPgIxZ-7iAqjoVD-83jysvRa6EIf2Ccfcblnz5slc1ThfV9i0EFyKwFPg1FDhPjQO3xsXJDFNNYmT45h1N8UAQnb9roCg3FapWvDgqK_E4S9bzMoSSuJ2r4PloWQaOjy_b8v300_j0lh3JWFxJ902ICgjruadualdBTHNuMILNpZhRmwNbvKMrT2eeYc8MGYo6453Rpq"
           alt="User profile picture"
+          className="hidden sm:block"
         />
       </div>
     </header>

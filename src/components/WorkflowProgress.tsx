@@ -44,26 +44,27 @@ export function WorkflowProgress() {
 
   return (
     <>
-      <div className="mb-8">
-        <div className="flex items-center">
-          {stagesToDisplay.map((stageName, index) => {
-            const stageData = getStageByName(stageName)
-            const actualIndex = allStages.indexOf(stageName)
-            const status = stageData?.status || 'pending'
-            const isAccessible = canAccessStage(stageName)
-            const isClickable = isAccessible && stageData
+      <div className="mb-6 sm:mb-8">
+        <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="flex items-center min-w-max sm:min-w-0">
+            {stagesToDisplay.map((stageName, index) => {
+              const stageData = getStageByName(stageName)
+              const actualIndex = allStages.indexOf(stageName)
+              const status = stageData?.status || 'pending'
+              const isAccessible = canAccessStage(stageName)
+              const isClickable = isAccessible && stageData
 
-            return (
-              <div key={stageName} className="flex items-center flex-1">
-                <button
-                  onClick={() => isClickable && handleStageClick(stageName)}
-                  disabled={!isClickable}
-                  className={cn(
-                    "flex flex-col items-center relative w-full",
-                    !isAccessible && showFullWorkflow && "opacity-30",
-                    isClickable && "cursor-pointer hover:opacity-80 transition-opacity"
-                  )}
-                >
+              return (
+                <div key={stageName} className="flex items-center flex-1 min-w-[80px] sm:min-w-0">
+                  <button
+                    onClick={() => isClickable && handleStageClick(stageName)}
+                    disabled={!isClickable}
+                    className={cn(
+                      "flex flex-col items-center relative w-full px-1 sm:px-2",
+                      !isAccessible && showFullWorkflow && "opacity-30",
+                      isClickable && "cursor-pointer hover:opacity-80 transition-opacity"
+                    )}
+                  >
                   {/* Stage dot */}
                   {status === 'active' ? (
                     <div className="relative">
@@ -85,7 +86,7 @@ export function WorkflowProgress() {
                   {/* Stage name and metadata */}
                   <p
                     className={cn(
-                      'text-xs font-bold mt-2 text-center',
+                      'text-[10px] sm:text-xs font-bold mt-1 sm:mt-2 text-center leading-tight',
                       status === 'completed' ? 'text-success' :
                       status === 'active' ? 'text-primary' :
                       status === 'blocked' ? 'text-danger' :
@@ -95,26 +96,50 @@ export function WorkflowProgress() {
                     {stageName}
                   </p>
 
+                  {/* Status & Priority Badges */}
+                  {stageData && isAccessible && (
+                    <div className="flex flex-col items-center gap-1 mt-1">
+                      {/* Status badge */}
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "text-[9px] sm:text-[10px] h-4 px-1.5 font-medium",
+                          status === 'completed' ? 'bg-success/20 text-success border-success' :
+                          status === 'active' ? 'bg-primary/20 text-primary border-primary' :
+                          status === 'blocked' ? 'bg-danger/20 text-danger border-danger' :
+                          'bg-muted text-muted-foreground border-border'
+                        )}
+                      >
+                        {status}
+                      </Badge>
+
+                      {/* Priority badge */}
+                      {stageData.priority !== 'medium' && (
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-[9px] sm:text-[10px] h-4 px-1.5 font-medium",
+                            stageData.priority === 'urgent' ? 'bg-danger/20 text-danger border-danger' :
+                            stageData.priority === 'high' ? 'bg-warning/20 text-warning border-warning' :
+                            'bg-blue-500/20 text-blue-500 border-blue-500'
+                          )}
+                        >
+                          {stageData.priority}
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+
                   {/* Department head avatar */}
                   {stageData?.departmentHead && isAccessible && (
-                    <Avatar src={stageData.departmentHead.avatar} className="size-4 mt-1" title={stageData.departmentHead.name} />
+                    <Avatar src={stageData.departmentHead.avatar} className="hidden lg:block size-4 mt-1" title={stageData.departmentHead.name} />
                   )}
 
                   {/* Due date badge */}
                   {stageData?.dueDate && isAccessible && (
-                    <Badge variant="outline" className="text-xs mt-1 h-4 px-1">
+                    <Badge variant="outline" className="hidden lg:block text-xs mt-1 h-4 px-1">
                       {stageData.dueDate}
                     </Badge>
-                  )}
-
-                  {/* Priority indicator */}
-                  {stageData && stageData.priority !== 'medium' && isAccessible && (
-                    <div className={cn(
-                      "absolute -top-1 -right-1 size-2 rounded-full",
-                      stageData.priority === 'urgent' ? 'bg-danger' :
-                      stageData.priority === 'high' ? 'bg-warning' :
-                      'bg-muted'
-                    )} />
                   )}
                 </button>
 
@@ -122,7 +147,7 @@ export function WorkflowProgress() {
                 {index < stagesToDisplay.length - 1 && (
                   <div
                     className={cn(
-                      'w-full h-1',
+                      'w-full h-0.5 sm:h-1 mx-1',
                       status === 'completed' ? 'bg-success' :
                       status === 'active' ? 'bg-primary' :
                       status === 'blocked' ? 'bg-danger' :
@@ -134,6 +159,7 @@ export function WorkflowProgress() {
               </div>
             )
           })}
+          </div>
         </div>
       </div>
 

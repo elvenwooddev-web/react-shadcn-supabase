@@ -5,6 +5,7 @@ import { useProjects } from './ProjectContext'
 import { useTasks } from './TaskContext'
 import { useFiles } from './FileContext'
 import { useDocuments } from './DocumentContext'
+import { useApprovals } from './ApprovalContext'
 
 // Default global rules
 const defaultGlobalRules: AnyWorkflowRule[] = [
@@ -40,6 +41,7 @@ export function WorkflowRulesProvider({ children }: { children: ReactNode }) {
   const { tasks } = useTasks()
   const { files } = useFiles()
   const { documents } = useDocuments()
+  const { getApprovalsByStage, getPendingApprovals } = useApprovals()
 
   const [globalRules, setGlobalRules] = useState<AnyWorkflowRule[]>(() =>
     loadFromLocalStorage('workflowRules', defaultGlobalRules)
@@ -163,6 +165,15 @@ export function WorkflowRulesProvider({ children }: { children: ReactNode }) {
     const unapprovedRequiredDocs = requiredDocs.filter(d => d.status !== 'approved')
     if (unapprovedRequiredDocs.length > 0) {
       reasons.push(`${unapprovedRequiredDocs.length} required document(s) not approved`)
+    }
+
+    // Check for pending approvals for this stage
+    const stageApprovals = getApprovalsByStage(stage)
+    const pendingApprovals = stageApprovals.filter(
+      (approval) => approval.status === 'pending' || approval.status === 'delegated'
+    )
+    if (pendingApprovals.length > 0) {
+      reasons.push(`${pendingApprovals.length} approval(s) pending for this stage`)
     }
 
     for (const rule of activeRules) {

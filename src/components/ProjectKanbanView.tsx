@@ -31,7 +31,7 @@ const STATUS_COLUMNS: { status: ProjectStatus; label: string }[] = [
 type OrganizeBy = 'stage' | 'status'
 
 export function ProjectKanbanView({ projects, onProjectClick }: ProjectKanbanViewProps) {
-  const { updateProject } = useProjects()
+  const { updateProject, deleteProject } = useProjects()
   const [organizeBy, setOrganizeBy] = useState<OrganizeBy>('stage')
 
   const handleEdit = (updatedProject: Project) => {
@@ -40,6 +40,10 @@ export function ProjectKanbanView({ projects, onProjectClick }: ProjectKanbanVie
 
   const handleArchive = (projectId: string) => {
     updateProject(projectId, { status: 'archived' })
+  }
+
+  const handleDelete = (projectId: string) => {
+    deleteProject(projectId)
   }
 
   const getProjectsByStage = (stage: WorkflowStage) => {
@@ -101,6 +105,7 @@ export function ProjectKanbanView({ projects, onProjectClick }: ProjectKanbanVie
                               onProjectClick={onProjectClick}
                               onEdit={handleEdit}
                               onArchive={handleArchive}
+                              onDelete={handleDelete}
                             />
                           </div>
                         ))
@@ -140,6 +145,7 @@ export function ProjectKanbanView({ projects, onProjectClick }: ProjectKanbanVie
                               onProjectClick={onProjectClick}
                               onEdit={handleEdit}
                               onArchive={handleArchive}
+                              onDelete={handleDelete}
                             />
                           </div>
                         ))

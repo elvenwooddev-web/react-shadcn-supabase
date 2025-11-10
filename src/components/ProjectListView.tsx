@@ -8,7 +8,7 @@ interface ProjectListViewProps {
 }
 
 export function ProjectListView({ projects, onProjectClick }: ProjectListViewProps) {
-  const { updateProject } = useProjects()
+  const { updateProject, deleteProject } = useProjects()
 
   const handleEdit = (updatedProject: Project) => {
     updateProject(updatedProject.id, updatedProject)
@@ -16,6 +16,10 @@ export function ProjectListView({ projects, onProjectClick }: ProjectListViewPro
 
   const handleArchive = (projectId: string) => {
     updateProject(projectId, { status: 'archived' })
+  }
+
+  const handleDelete = (projectId: string) => {
+    deleteProject(projectId)
   }
 
   return (
@@ -27,6 +31,7 @@ export function ProjectListView({ projects, onProjectClick }: ProjectListViewPro
           onProjectClick={onProjectClick}
           onEdit={handleEdit}
           onArchive={handleArchive}
+          onDelete={handleDelete}
         />
       ))}
     </div>

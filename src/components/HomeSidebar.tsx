@@ -45,7 +45,7 @@ export function HomeSidebar() {
     .slice(0, 3)
 
   return (
-    <aside className="w-80 border-l border-border bg-card p-6 space-y-6">
+    <aside className="w-full xl:w-80 xl:border-l border-t xl:border-t-0 border-border bg-card p-4 sm:p-6 space-y-6">
       {/* Overview Stats */}
       <Card>
         <CardHeader className="pb-3">

@@ -1,10 +1,12 @@
 import { useState, useEffect, type FormEvent } from 'react'
-import { Calendar, User, AlertCircle, CheckCircle, XCircle, FileText } from 'lucide-react'
+import { Calendar, User, AlertCircle, CheckCircle, XCircle, FileText, Shield } from 'lucide-react'
 import { useStages } from '@/contexts/StageContext'
 import { useTeam } from '@/contexts/TeamContext'
 import { useWorkflowRules } from '@/contexts/WorkflowRulesContext'
 import { useDocuments } from '@/contexts/DocumentContext'
+import { useApprovals } from '@/contexts/ApprovalContext'
 import type { ProjectStage, StageStatus, TaskPriority } from '@/types'
+import { ApprovalsList } from '@/components/ApprovalsList'
 import {
   Dialog,
   DialogContent,
@@ -30,6 +32,7 @@ export function StageDetailDialog({ stage, open, onOpenChange }: StageDetailDial
   const { teamMembers } = useTeam()
   const { canCompleteStage, getMissingRequirements } = useWorkflowRules()
   const { getRequiredDocumentsForStage, getApprovedRequiredDocuments, getTotalRequiredDocuments } = useDocuments()
+  const { getApprovalsByStage } = useApprovals()
 
   const [formData, setFormData] = useState({
     status: stage.status,
@@ -44,6 +47,12 @@ export function StageDetailDialog({ stage, open, onOpenChange }: StageDetailDial
   const requiredDocs = getRequiredDocumentsForStage(stage.stage)
   const approvedRequiredDocs = getApprovedRequiredDocuments(stage.stage)
   const totalRequiredDocs = getTotalRequiredDocuments(stage.stage)
+
+  const stageApprovals = getApprovalsByStage(stage.stage)
+  const pendingApprovals = stageApprovals.filter(
+    (approval) => approval.status === 'pending' || approval.status === 'delegated'
+  )
+  const approvedCount = stageApprovals.filter((approval) => approval.status === 'approved').length
 
   useEffect(() => {
     if (open) {
@@ -105,6 +114,33 @@ export function StageDetailDialog({ stage, open, onOpenChange }: StageDetailDial
             {progress.tasksComplete} of {progress.tasksTotal} tasks completed
           </p>
         </div>
+
+        {/* Approvals Section */}
+        {stageApprovals.length > 0 && (
+          <div className="py-4 border-y border-border">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Stage Approvals</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {pendingApprovals.length > 0 ? (
+                  <span className="text-xs px-2 py-1 rounded-md bg-warning/20 text-warning">
+                    {pendingApprovals.length} Pending
+                  </span>
+                ) : (
+                  <span className="text-xs px-2 py-1 rounded-md bg-success/20 text-success">
+                    All Approved
+                  </span>
+                )}
+                <span className="text-sm font-bold">
+                  {approvedCount}/{stageApprovals.length}
+                </span>
+              </div>
+            </div>
+            <ApprovalsList filterByStage={stage.stage} compact={true} />
+          </div>
+        )}
 
         {/* Required Documents */}
         {totalRequiredDocs > 0 && (

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Search, LayoutGrid, List, Kanban, Filter, X } from 'lucide-react'
+import { Plus, Search, LayoutGrid, List, Kanban, Filter, X, Menu } from 'lucide-react'
 import { useProjects } from '@/contexts/ProjectContext'
 import { useTeam } from '@/contexts/TeamContext'
 import type { WorkflowStage, ProjectStatus } from '@/types'
@@ -24,6 +24,7 @@ export function ProjectsListPage() {
   const [filterStatus, setFilterStatus] = useState<ProjectStatus | 'all'>('all')
   const [filterStage, setFilterStage] = useState<WorkflowStage | 'all'>('all')
   const [showFilters, setShowFilters] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   // Clear current project when viewing all projects
   useEffect(() => {
@@ -74,23 +75,38 @@ export function ProjectsListPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <LeftSidebar />
-      <div className="flex-1 p-8">
+    <div className="flex flex-col xl:flex-row min-h-screen bg-background">
+      <LeftSidebar
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+      />
+      <div className="flex-1 p-4 sm:p-6 lg:p-8">
         <div className="container mx-auto max-w-6xl">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">All Projects</h1>
-              <p className="text-muted-foreground">Manage your interior design projects</p>
-            </div>
+          <div className="flex items-start sm:items-center gap-3 mb-6 sm:mb-8">
+            {/* Mobile menu button */}
             <Button
-              onClick={() => navigate('/projects/new')}
-              className="bg-primary hover:bg-primary/90 text-white"
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden mt-1 sm:mt-0 shrink-0"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              New Project
+              <Menu className="h-5 w-5" />
             </Button>
+
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-1">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">All Projects</h1>
+                <p className="text-sm sm:text-base text-muted-foreground">Manage your interior design projects</p>
+              </div>
+              <Button
+                onClick={() => navigate('/projects/new')}
+                className="bg-primary hover:bg-primary/90 text-white w-full sm:w-auto shrink-0"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                New Project
+              </Button>
+            </div>
           </div>
 
           {/* Search Bar and Filters */}

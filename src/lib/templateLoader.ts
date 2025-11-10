@@ -1,4 +1,4 @@
-import type { Task, RequiredFile, StageDocument, TeamMember, TemplateStage } from '@/types'
+import type { Task, RequiredFile, StageDocument, TeamMember, TemplateStage, TemplateApproval, ApprovalRequest } from '@/types'
 import { generateId } from '@/lib/helpers'
 import { residentialTemplate } from '@/data/templates/residentialTemplate'
 
@@ -6,7 +6,7 @@ import { residentialTemplate } from '@/data/templates/residentialTemplate'
  * Template Loading System
  *
  * This module provides functionality to initialize new projects with pre-defined template data.
- * It loads tasks, files, documents, and stage configuration from template definitions.
+ * It loads tasks, files, documents, stage configuration, and approval workflows from template definitions.
  */
 
 export interface TemplateData {
@@ -14,6 +14,7 @@ export interface TemplateData {
   files: RequiredFile[]
   documents: StageDocument[]
   stages?: TemplateStage[]
+  approvals?: ApprovalRequest[]
 }
 
 /**
@@ -26,7 +27,7 @@ export interface TemplateData {
  */
 export function loadTemplate(
   templateType: 'residential',
-  _projectId: string,
+  projectId: string,
   teamMembers: TeamMember[]
 ): TemplateData {
   // Use residential template
@@ -44,11 +45,17 @@ export function loadTemplate(
   // Get stage configuration from template (if available)
   const stages = template.stages
 
+  // Generate approval requests from template (if available)
+  const approvals = template.approvals
+    ? generateApprovalsFromTemplate(template.approvals, projectId, tasks, documents, teamMembers)
+    : []
+
   return {
     tasks,
     files,
     documents,
     stages,
+    approvals,
   }
 }
 
@@ -70,15 +77,14 @@ function generateTasksFromTemplate(
     if (!Array.isArray(taskArray)) continue
 
     for (const templateTask of taskArray) {
-      // Assign a team member based on the stage
-      const assignee = assignTeamMemberToTask(templateTask.stage, teamMembers)
-
+      // Leave tasks unassigned - project manager will assign them manually
       const task: Task = {
         id: generateId(),
+        trackingId: `T-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
         title: templateTask.title,
         description: templateTask.description,
         dueDate: templateTask.dueDate,
-        assignee,
+        assignee: undefined, // Tasks start unassigned
         status: templateTask.status || 'todo',
         priority: templateTask.priority || 'medium',
         stage: templateTask.stage,
@@ -89,8 +95,13 @@ function generateTasksFromTemplate(
         subtasks: templateTask.subtasks?.map((subtask: any) => ({
           ...subtask,
           id: generateId(),
-          assigneeId: assignee.id,
-          avatar: assignee.avatar,
+          trackingId: `ST-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          assigneeId: undefined, // Subtasks also unassigned
+          avatar: undefined,
+          status: subtask.status || 'todo',
+          priority: subtask.priority || 'medium',
+          createdAt: new Date(),
+          updatedAt: new Date(),
         })),
         attachments: templateTask.attachments?.map((attachment: any) => ({
           ...attachment,
@@ -168,6 +179,133 @@ function assignTeamMemberToTask(
 
   // If no match found, return the first team member
   return teamMembers[0]
+}
+
+/**
+ * Generate approval requests from template approvals
+ */
+function generateApprovalsFromTemplate(
+  templateApprovals: TemplateApproval[],
+  projectId: string,
+  tasks: Task[],
+  documents: StageDocument[],
+  teamMembers: TeamMember[]
+): ApprovalRequest[] {
+  const approvalRequests: ApprovalRequest[] = []
+
+  for (const templateApproval of templateApprovals) {
+    let entityId: string | undefined
+    let entityName: string | undefined
+
+    // Map entity identifier to actual entity ID
+    if (templateApproval.entityType === 'task') {
+      const matchedTask = tasks.find((t) => t.title === templateApproval.entityIdentifier)
+      if (matchedTask) {
+        entityId = matchedTask.id
+        entityName = matchedTask.title
+      }
+    } else if (templateApproval.entityType === 'document') {
+      const matchedDoc = documents.find((d) => d.title === templateApproval.entityIdentifier)
+      if (matchedDoc) {
+        entityId = matchedDoc.id
+        entityName = matchedDoc.title
+      }
+    } else if (templateApproval.entityType === 'stage') {
+      // For stages, use the stage name as the entity ID
+      entityId = templateApproval.entityIdentifier
+      entityName = templateApproval.entityIdentifier
+    }
+
+    // Skip if entity not found
+    if (!entityId || !entityName) continue
+
+    // Get first approval config to assign initial approver
+    const firstConfig = templateApproval.approvalConfigs[0]
+    const initialApprover = assignApprover(firstConfig, teamMembers)
+
+    // Create approval request
+    const approvalRequest: ApprovalRequest = {
+      id: generateId(),
+      projectId,
+      source: 'template', // Mark as template-based approval
+      templateApprovalId: templateApproval.id,
+      entityType: templateApproval.entityType,
+      entityId,
+      entityName,
+      stage: templateApproval.stage,
+      status: 'pending',
+      currentApprovalLevel: 0,
+      approvalConfigs: templateApproval.approvalConfigs,
+      requestedBy: teamMembers[0], // First team member as requester
+      requestedAt: new Date(),
+      assignedTo: initialApprover,
+      comments: [],
+      remindersSent: 0,
+      history: [
+        {
+          id: generateId(),
+          action: 'requested',
+          actor: teamMembers[0],
+          timestamp: new Date(),
+        },
+      ],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+
+    // Set expiry date if configured
+    if (firstConfig.expiryDays) {
+      const expiryDate = new Date()
+      expiryDate.setDate(expiryDate.getDate() + firstConfig.expiryDays)
+      approvalRequest.expiresAt = expiryDate
+    }
+
+    approvalRequests.push(approvalRequest)
+  }
+
+  return approvalRequests
+}
+
+/**
+ * Assign approver based on ApprovalConfig
+ */
+function assignApprover(config: any, teamMembers: TeamMember[]): TeamMember {
+  // Default to first team member if assignment fails
+  let approver = teamMembers[0]
+
+  switch (config.approverType) {
+    case 'department-head':
+      // Find team member matching department role
+      approver = teamMembers.find((tm) =>
+        tm.role.toLowerCase().includes(config.approverRole?.toLowerCase() || '')
+      ) || teamMembers[0]
+      break
+    case 'project-manager':
+      approver = teamMembers.find((tm) =>
+        tm.role.toLowerCase().includes('manager')
+      ) || teamMembers[0]
+      break
+    case 'admin':
+      approver = teamMembers.find((tm) =>
+        tm.role.toLowerCase().includes('admin')
+      ) || teamMembers[0]
+      break
+    case 'specific-user':
+      approver = teamMembers.find((tm) => tm.id === config.approverUserId) || teamMembers[0]
+      break
+    case 'client':
+    case 'external':
+      // Create placeholder for client/external approvers
+      approver = {
+        id: `${config.approverType}-${Date.now()}`,
+        name: config.approverType === 'client' ? 'Client' : 'External Consultant',
+        role: config.approverType === 'client' ? 'Client' : 'External Consultant',
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${config.approverType}`,
+      }
+      break
+  }
+
+  return approver
 }
 
 /**

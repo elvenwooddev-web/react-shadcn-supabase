@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react'
 import { useTasks } from '@/contexts/TaskContext'
 import { useTeam } from '@/contexts/TeamContext'
 import { useUser } from '@/contexts/UserContext'
+import { useStatusConfig } from '@/contexts/StatusConfigContext'
 import type { WorkflowStage, TaskStatus, TaskPriority } from '@/types'
 import {
   Dialog,
@@ -15,13 +16,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-
-const statusOptions: { value: TaskStatus; label: string }[] = [
-  { value: 'todo', label: 'To Do' },
-  { value: 'in-progress', label: 'In Progress' },
-  { value: 'blocked', label: 'Blocked' },
-  { value: 'completed', label: 'Completed' },
-]
+import { StatusSelect } from '@/components/ui/status-selector'
 
 const priorityOptions: { value: TaskPriority; label: string }[] = [
   { value: 'low', label: 'Low' },
@@ -35,13 +30,17 @@ export function AddTaskDialog() {
   const { createTask } = useTasks()
   const { teamMembers } = useTeam()
   const { visibleStages } = useUser()
+  const { getDefaultStatus } = useStatusConfig()
+
+  const defaultTaskStatus = getDefaultStatus('task')?.value || 'todo'
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     dueDate: '',
-    assigneeId: teamMembers[0]?.id || '',
+    assigneeId: '',
     stage: (visibleStages[0] || 'Sales') as WorkflowStage,
-    status: 'todo' as TaskStatus,
+    status: defaultTaskStatus as TaskStatus,
     priority: 'medium' as TaskPriority,
   })
 
@@ -52,9 +51,9 @@ export function AddTaskDialog() {
       title: '',
       description: '',
       dueDate: '',
-      assigneeId: teamMembers[0]?.id || '',
+      assigneeId: '',
       stage: visibleStages[0] || 'Sales',
-      status: 'todo',
+      status: defaultTaskStatus,
       priority: 'medium',
     })
     setOpen(false)
@@ -110,14 +109,14 @@ export function AddTaskDialog() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="assignee">Assignee*</Label>
+              <Label htmlFor="assignee">Assignee (Optional)</Label>
               <select
                 id="assignee"
-                required
                 value={formData.assigneeId}
                 onChange={(e) => setFormData({ ...formData, assigneeId: e.target.value })}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
+                <option value="">None (Unassigned)</option>
                 {teamMembers.map((member) => (
                   <option key={member.id} value={member.id}>
                     {member.name}
@@ -147,19 +146,12 @@ export function AddTaskDialog() {
 
             <div className="space-y-2">
               <Label htmlFor="status">Status*</Label>
-              <select
-                id="status"
-                required
+              <StatusSelect
+                entityType="task"
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as TaskStatus })}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                {statusOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setFormData({ ...formData, status: value as TaskStatus })}
+                required
+              />
             </div>
 
             <div className="space-y-2">

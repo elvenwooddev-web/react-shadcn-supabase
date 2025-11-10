@@ -1,4 +1,4 @@
-import { MoreVertical, Edit, Archive } from 'lucide-react'
+import { MoreVertical, Edit, Archive, Trash2 } from 'lucide-react'
 import type { Project } from '@/types'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -6,9 +6,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { EditProjectDialog } from '@/components/EditProjectDialog'
+import { DeleteProjectDialog } from '@/components/DeleteProjectDialog'
 import { useProjects } from '@/contexts/ProjectContext'
 import { useState } from 'react'
 
@@ -18,8 +20,9 @@ interface ProjectTableViewProps {
 }
 
 export function ProjectTableView({ projects, onProjectClick }: ProjectTableViewProps) {
-  const { updateProject } = useProjects()
+  const { updateProject, deleteProject } = useProjects()
   const [editingProject, setEditingProject] = useState<Project | null>(null)
+  const [deletingProject, setDeletingProject] = useState<Project | null>(null)
 
   const handleEdit = (updatedProject: Project) => {
     updateProject(updatedProject.id, updatedProject)
@@ -27,6 +30,13 @@ export function ProjectTableView({ projects, onProjectClick }: ProjectTableViewP
 
   const handleArchive = (projectId: string) => {
     updateProject(projectId, { status: 'archived' })
+  }
+
+  const handleDelete = () => {
+    if (deletingProject) {
+      deleteProject(deletingProject.id)
+      setDeletingProject(null)
+    }
   }
 
   return (
@@ -132,6 +142,14 @@ export function ProjectTableView({ projects, onProjectClick }: ProjectTableViewP
                         <Archive className="h-4 w-4 mr-2" />
                         Archive
                       </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => setDeletingProject(project)}
+                        className="text-danger focus:text-danger focus:bg-danger/10"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </td>
@@ -151,6 +169,16 @@ export function ProjectTableView({ projects, onProjectClick }: ProjectTableViewP
             handleEdit(updatedProject)
             setEditingProject(null)
           }}
+        />
+      )}
+
+      {/* Delete Dialog */}
+      {deletingProject && (
+        <DeleteProjectDialog
+          project={deletingProject}
+          open={!!deletingProject}
+          onOpenChange={(open) => !open && setDeletingProject(null)}
+          onConfirm={handleDelete}
         />
       )}
     </>

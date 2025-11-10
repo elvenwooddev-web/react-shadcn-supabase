@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Settings as SettingsIcon, Workflow, Users, Palette } from 'lucide-react'
+import { ArrowLeft, Settings as SettingsIcon, Workflow, Users, Palette, Tag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { LeftSidebar } from '@/components/LeftSidebar'
 import { WorkflowRulesTab } from '@/components/settings/WorkflowRulesTab'
+import { StatusConfigTab } from '@/components/settings/StatusConfigTab'
 import { useProjects } from '@/contexts/ProjectContext'
 
-type SettingsTab = 'workflow' | 'team' | 'appearance' | 'general'
+type SettingsTab = 'workflow' | 'status' | 'team' | 'appearance' | 'general'
 
 export function SettingsPage() {
   const { projectId } = useParams<{ projectId?: string }>()
@@ -21,6 +22,7 @@ export function SettingsPage() {
 
   const tabs = [
     { id: 'workflow', label: 'Workflow Rules', icon: Workflow },
+    { id: 'status', label: 'Status Configuration', icon: Tag },
     { id: 'team', label: 'Team & Access', icon: Users },
     { id: 'appearance', label: 'Appearance', icon: Palette },
     { id: 'general', label: 'General', icon: SettingsIcon },
@@ -82,6 +84,8 @@ export function SettingsPage() {
           {/* Tab Content */}
           <div>
             {activeTab === 'workflow' && <WorkflowRulesTab scope={scope} projectId={projectId} />}
+
+            {activeTab === 'status' && <StatusConfigTab />}
 
             {activeTab === 'team' && (
               <Card className="p-6">

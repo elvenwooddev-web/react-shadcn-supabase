@@ -1,4 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { StatusConfigProvider } from '@/contexts/StatusConfigContext'
+import { ApprovalProvider } from '@/contexts/ApprovalContext'
+import { ApprovalRuleProvider } from '@/contexts/ApprovalRuleContext'
 import { UserProvider } from '@/contexts/UserContext'
 import { ProjectProvider } from '@/contexts/ProjectContext'
 import { TaskProvider } from '@/contexts/TaskContext'
@@ -13,6 +16,8 @@ import { ProjectsListPage } from '@/pages/ProjectsListPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { NewProjectPage } from '@/pages/NewProjectPage'
 import { IssuesPage } from '@/pages/IssuesPage'
+import { ApprovalsPage } from '@/pages/ApprovalsPage'
+import { ApprovalsSettingsPage } from '@/pages/ApprovalsSettingsPage'
 import { ProjectLayout } from '@/pages/ProjectLayout'
 import { ProjectOverviewPage } from '@/pages/ProjectOverviewPage'
 import { TemplatesListPage } from '@/pages/TemplatesListPage'
@@ -24,16 +29,19 @@ import { ChatPage } from '@/pages/ChatPage'
 function App() {
   return (
     <BrowserRouter>
-      <UserProvider>
-        <TemplateProvider>
-          <ProjectProvider>
-            <TaskProvider>
-              <FileProvider>
-                <DocumentProvider>
-                  <TeamProvider>
-                    <IssueProvider>
-                      <StageProvider>
-                        <WorkflowRulesProvider>
+      <StatusConfigProvider>
+        <UserProvider>
+          <TemplateProvider>
+            <ProjectProvider>
+              <TeamProvider>
+                <ApprovalProvider>
+                  <ApprovalRuleProvider>
+                    <TaskProvider>
+                      <FileProvider>
+                        <DocumentProvider>
+                          <IssueProvider>
+                            <StageProvider>
+                              <WorkflowRulesProvider>
                           <Routes>
                             <Route path="/" element={<ProjectsListPage />} />
                             <Route path="/projects/new" element={<NewProjectPage />} />
@@ -41,7 +49,10 @@ function App() {
                             <Route path="/templates/:id/edit" element={<TemplateEditorPage />} />
                             <Route path="/settings" element={<SettingsPage />} />
                             <Route path="/issues" element={<IssuesPage />} />
+                            <Route path="/approvals" element={<ApprovalsPage />} />
+                            <Route path="/approvals/settings" element={<ApprovalsSettingsPage />} />
                             <Route path="/projects/:projectId/settings" element={<SettingsPage />} />
+                            <Route path="/projects/:projectId/approvals/settings" element={<ApprovalsSettingsPage />} />
                             <Route path="/projects/:projectId" element={<ProjectLayout />}>
                               <Route index element={<Navigate to="workflow" replace />} />
                               <Route path="overview" element={<ProjectOverviewPage />} />
@@ -51,16 +62,19 @@ function App() {
                             </Route>
                             <Route path="*" element={<Navigate to="/" replace />} />
                           </Routes>
-                        </WorkflowRulesProvider>
-                      </StageProvider>
-                    </IssueProvider>
-                  </TeamProvider>
-                </DocumentProvider>
-              </FileProvider>
-            </TaskProvider>
-          </ProjectProvider>
-        </TemplateProvider>
-      </UserProvider>
+                              </WorkflowRulesProvider>
+                            </StageProvider>
+                          </IssueProvider>
+                        </DocumentProvider>
+                      </FileProvider>
+                    </TaskProvider>
+                  </ApprovalRuleProvider>
+                </ApprovalProvider>
+              </TeamProvider>
+            </ProjectProvider>
+          </TemplateProvider>
+        </UserProvider>
+      </StatusConfigProvider>
     </BrowserRouter>
   )
 }
