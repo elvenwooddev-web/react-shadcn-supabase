@@ -12,8 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { EditProjectDialog } from '@/components/EditProjectDialog'
-import { DeleteProjectDialog } from '@/components/DeleteProjectDialog'
+import { EditProjectDialog, DeleteProjectDialog } from '@/components/projects'
 
 interface ProjectCardProps {
   project: Project

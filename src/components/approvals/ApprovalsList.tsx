@@ -6,7 +6,7 @@ import type { ApprovalEntityType, ApprovalStatus, WorkflowStage } from '@/types'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ApprovalRequestCard } from '@/components/ApprovalRequestCard'
+import { ApprovalRequestCard } from './ApprovalRequestCard'
 
 interface ApprovalsListProps {
   filterByStage?: WorkflowStage

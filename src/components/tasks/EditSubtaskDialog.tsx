@@ -17,8 +17,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { CreateIssueDialog } from '@/components/CreateIssueDialog'
-import { IssueIndicator } from '@/components/IssueIndicator'
+import { CreateIssueDialog, IssueIndicator } from '@/components/issues'
 
 const statusOptions: { value: TaskStatus; label: string }[] = [
   { value: 'todo', label: 'To Do' },

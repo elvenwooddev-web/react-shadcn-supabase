@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { AddRuleDialog } from '@/components/settings/AddRuleDialog'
-import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog'
+import { DeleteConfirmDialog } from '@/components/shared'
 import type { AnyWorkflowRule } from '@/types'
 
 interface WorkflowRulesTabProps {

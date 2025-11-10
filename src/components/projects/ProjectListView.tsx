@@ -1,5 +1,5 @@
 import type { Project } from '@/types'
-import { ProjectCard } from '@/components/ProjectCard'
+import { ProjectCard } from '@/components/projects'
 import { useProjects } from '@/contexts/ProjectContext'
 
 interface ProjectListViewProps {

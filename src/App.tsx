@@ -22,8 +22,8 @@ import { ProjectLayout } from '@/pages/ProjectLayout'
 import { ProjectOverviewPage } from '@/pages/ProjectOverviewPage'
 import { TemplatesListPage } from '@/pages/TemplatesListPage'
 import { TemplateEditorPage } from '@/pages/TemplateEditorPage'
-import { WorkflowPage } from '@/components/WorkflowPage'
-import { FilesPage } from '@/components/FilesPage'
+import { WorkflowPage } from '@/pages/WorkflowPage'
+import { FilesPage } from '@/pages/FilesPage'
 import { ChatPage } from '@/pages/ChatPage'
 
 function App() {

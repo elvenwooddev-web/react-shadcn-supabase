@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { Header } from '@/components/Header'
-import { LeftSidebar } from '@/components/LeftSidebar'
-import { RightSidebar } from '@/components/RightSidebar'
+import { Header, LeftSidebar, RightSidebar } from '@/components/layouts'
 
 export function ProjectLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)

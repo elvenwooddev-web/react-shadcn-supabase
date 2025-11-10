@@ -9,11 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { HomeSidebar } from '@/components/HomeSidebar'
-import { LeftSidebar } from '@/components/LeftSidebar'
-import { ProjectListView } from '@/components/ProjectListView'
-import { ProjectTableView } from '@/components/ProjectTableView'
-import { ProjectKanbanView } from '@/components/ProjectKanbanView'
+import { HomeSidebar, LeftSidebar } from '@/components/layouts'
+import { ProjectListView, ProjectTableView, ProjectKanbanView } from '@/components/projects'
 
 export function ProjectsListPage() {
   const { projects, setCurrentProject } = useProjects()

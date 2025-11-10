@@ -26,7 +26,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { AddStatusDialog } from '@/components/settings/AddStatusDialog'
 import { EditStatusDialog } from '@/components/settings/EditStatusDialog'
-import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog'
+import { DeleteConfirmDialog } from '@/components/shared'
 
 interface SortableStatusItemProps {
   status: StatusConfig

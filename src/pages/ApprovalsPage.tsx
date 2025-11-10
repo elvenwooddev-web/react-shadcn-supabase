@@ -3,11 +3,11 @@ import { Shield, CheckCircle, Clock, XCircle, TrendingUp } from 'lucide-react'
 import { useApprovals } from '@/contexts/ApprovalContext'
 import { useUser } from '@/contexts/UserContext'
 import { useProjects } from '@/contexts/ProjectContext'
-import { LeftSidebar } from '@/components/LeftSidebar'
+import { LeftSidebar } from '@/components/layouts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { ApprovalsList } from '@/components/ApprovalsList'
+import { ApprovalsList } from '@/components/approvals'
 
 type ApprovalsView = 'all' | 'my-approvals'
 

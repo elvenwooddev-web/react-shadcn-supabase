@@ -4,7 +4,10 @@
       "Bash(dir:*)",
       "Bash(nul)",
       "Bash(findstr:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(tree:*)",
+      "Bash(for f in src/components/*.tsx)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

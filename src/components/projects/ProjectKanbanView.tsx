@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Project, WorkflowStage, ProjectStatus } from '@/types'
-import { ProjectCard } from '@/components/ProjectCard'
+import { ProjectCard } from '@/components/projects'
 import { useProjects } from '@/contexts/ProjectContext'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'

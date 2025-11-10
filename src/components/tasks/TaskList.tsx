@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils'
 import { useTasks } from '@/contexts/TaskContext'
 import { useFiles } from '@/contexts/FileContext'
 import { useProjects } from '@/contexts/ProjectContext'
-import { TaskCard } from '@/components/TaskCard'
-import { StageDocumentsTab } from '@/components/StageDocumentsTab'
+import { TaskCard } from '@/components/tasks'
+import { StageDocumentsTab } from '@/components/shared'
 
 export function TaskList() {
   const [activeTab, setActiveTab] = useState<'tasks' | 'files' | 'documents'>('tasks')

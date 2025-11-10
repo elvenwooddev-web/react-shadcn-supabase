@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar } from '@/components/ui/avatar'
-import { ApprovalActionDialog } from '@/components/ApprovalActionDialog'
+import { ApprovalActionDialog } from './ApprovalActionDialog'
 import { formatRelativeTime } from '@/lib/helpers'
 import { cn } from '@/lib/utils'
 

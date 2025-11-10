@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog'
-import { LeftSidebar } from '@/components/LeftSidebar'
+import { DeleteConfirmDialog } from '@/components/shared'
+import { LeftSidebar } from '@/components/layouts'
 import {
   Dialog,
   DialogContent,

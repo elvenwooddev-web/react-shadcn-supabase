@@ -6,7 +6,7 @@ import { useWorkflowRules } from '@/contexts/WorkflowRulesContext'
 import { useDocuments } from '@/contexts/DocumentContext'
 import { useApprovals } from '@/contexts/ApprovalContext'
 import type { ProjectStage, StageStatus, TaskPriority } from '@/types'
-import { ApprovalsList } from '@/components/ApprovalsList'
+import { ApprovalsList } from '@/components/approvals'
 import {
   Dialog,
   DialogContent,

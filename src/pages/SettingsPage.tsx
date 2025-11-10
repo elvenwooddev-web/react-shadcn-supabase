@@ -4,7 +4,7 @@ import { ArrowLeft, Settings as SettingsIcon, Workflow, Users, Palette, Tag } fr
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { LeftSidebar } from '@/components/LeftSidebar'
+import { LeftSidebar } from '@/components/layouts'
 import { WorkflowRulesTab } from '@/components/settings/WorkflowRulesTab'
 import { StatusConfigTab } from '@/components/settings/StatusConfigTab'
 import { useProjects } from '@/contexts/ProjectContext'
