@@ -1,28 +1,69 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Search, LayoutGrid } from 'lucide-react'
+import { Plus, Search, LayoutGrid, List, Kanban, Filter, X } from 'lucide-react'
 import { useProjects } from '@/contexts/ProjectContext'
+import { useTeam } from '@/contexts/TeamContext'
+import type { WorkflowStage, ProjectStatus } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Card, CardContent } from '@/components/ui/card'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { HomeSidebar } from '@/components/HomeSidebar'
 import { LeftSidebar } from '@/components/LeftSidebar'
+import { ProjectListView } from '@/components/ProjectListView'
+import { ProjectTableView } from '@/components/ProjectTableView'
+import { ProjectKanbanView } from '@/components/ProjectKanbanView'
 
 export function ProjectsListPage() {
   const { projects, setCurrentProject } = useProjects()
+  const { teamMembers } = useTeam()
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
+  const [filterManager, setFilterManager] = useState<string>('all')
+  const [filterStatus, setFilterStatus] = useState<ProjectStatus | 'all'>('all')
+  const [filterStage, setFilterStage] = useState<WorkflowStage | 'all'>('all')
+  const [showFilters, setShowFilters] = useState(false)
 
   // Clear current project when viewing all projects
   useEffect(() => {
     setCurrentProject(null)
   }, [])
 
-  const filteredProjects = projects.filter((project) =>
-    project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    project.clientName.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Get unique project managers
+  const projectManagers = Array.from(
+    new Set(projects.map(p => p.projectManager.id))
+  ).map(id => teamMembers.find(tm => tm.id === id)!)
+    .filter(Boolean)
+
+  const filteredProjects = projects.filter((project) => {
+    // Search filter
+    const matchesSearch =
+      project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.clientName.toLowerCase().includes(searchQuery.toLowerCase())
+
+    // Project Manager filter
+    const matchesManager = filterManager === 'all' || project.projectManager.id === filterManager
+
+    // Status filter
+    const matchesStatus = filterStatus === 'all' || project.status === filterStatus
+
+    // Stage filter
+    const matchesStage = filterStage === 'all' || project.currentStage === filterStage
+
+    return matchesSearch && matchesManager && matchesStatus && matchesStage
+  })
+
+  const activeFiltersCount =
+    (filterManager !== 'all' ? 1 : 0) +
+    (filterStatus !== 'all' ? 1 : 0) +
+    (filterStage !== 'all' ? 1 : 0)
+
+  const clearAllFilters = () => {
+    setFilterManager('all')
+    setFilterStatus('all')
+    setFilterStage('all')
+  }
 
   const handleProjectClick = (projectId: string) => {
     const project = projects.find((p) => p.id === projectId)
@@ -52,19 +93,107 @@ export function ProjectsListPage() {
             </Button>
           </div>
 
-          {/* Search Bar */}
-          <div className="mb-6 relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search projects..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
+          {/* Search Bar and Filters */}
+          <div className="mb-6 space-y-4">
+            <div className="flex gap-3">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search projects..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+              <Button
+                variant={showFilters ? 'default' : 'outline'}
+                onClick={() => setShowFilters(!showFilters)}
+                className="gap-2"
+              >
+                <Filter className="h-4 w-4" />
+                Filters
+                {activeFiltersCount > 0 && (
+                  <Badge variant="secondary" className="ml-1 px-1.5 py-0.5 text-xs">
+                    {activeFiltersCount}
+                  </Badge>
+                )}
+              </Button>
+            </div>
+
+            {/* Filter Panel */}
+            {showFilters && (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Project Manager Filter */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Project Manager</label>
+                      <select
+                        value={filterManager}
+                        onChange={(e) => setFilterManager(e.target.value)}
+                        className="w-full h-10 px-3 rounded-md border border-border bg-background text-foreground"
+                      >
+                        <option value="all">All Managers</option>
+                        {projectManagers.map((manager) => (
+                          <option key={manager.id} value={manager.id}>
+                            {manager.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Status Filter */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Status</label>
+                      <select
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value as ProjectStatus | 'all')}
+                        className="w-full h-10 px-3 rounded-md border border-border bg-background text-foreground"
+                      >
+                        <option value="all">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="on-hold">On Hold</option>
+                        <option value="completed">Completed</option>
+                        <option value="archived">Archived</option>
+                      </select>
+                    </div>
+
+                    {/* Stage Filter */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Stage</label>
+                      <select
+                        value={filterStage}
+                        onChange={(e) => setFilterStage(e.target.value as WorkflowStage | 'all')}
+                        className="w-full h-10 px-3 rounded-md border border-border bg-background text-foreground"
+                      >
+                        <option value="all">All Stages</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Design">Design</option>
+                        <option value="Technical Design">Technical Design</option>
+                        <option value="Procurement">Procurement</option>
+                        <option value="Production">Production</option>
+                        <option value="Execution">Execution</option>
+                        <option value="Post Installation">Post Installation</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Clear Filters Button */}
+                  {activeFiltersCount > 0 && (
+                    <div className="mt-4 flex justify-end">
+                      <Button variant="ghost" size="sm" onClick={clearAllFilters} className="gap-2">
+                        <X className="h-4 w-4" />
+                        Clear All Filters
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </div>
 
-          {/* Projects Grid */}
+          {/* Projects View Tabs */}
           {filteredProjects.length === 0 ? (
             <Card>
               <CardContent className="py-16 text-center">
@@ -84,72 +213,43 @@ export function ProjectsListPage() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredProjects.map((project) => (
-                <Card
-                  key={project.id}
-                  className="cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => handleProjectClick(project.id)}
-                >
-                  <CardHeader>
-                    <div className="flex items-start gap-3 mb-2">
-                      <div
-                        className="size-12 rounded-lg bg-cover bg-center shrink-0"
-                        style={{ backgroundImage: `url("${project.logo}")` }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <CardTitle className="text-lg truncate">{project.name}</CardTitle>
-                        <CardDescription className="truncate">{project.projectType}</CardDescription>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Badge
-                        variant={
-                          project.status === 'active'
-                            ? 'default'
-                            : project.status === 'completed'
-                            ? 'success'
-                            : 'secondary'
-                        }
-                      >
-                        {project.status}
-                      </Badge>
-                      <Badge variant="outline">{project.currentStage}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Client:</span>
-                        <span className="font-medium truncate ml-2">{project.clientName}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Due:</span>
-                        <span className="font-medium">{project.estimatedCompletion}</span>
-                      </div>
-                      <div className="flex items-center gap-2 pt-2">
-                        <span className="text-muted-foreground text-xs">Team:</span>
-                        <div className="flex -space-x-2">
-                          {project.teamMembers.slice(0, 3).map((member) => (
-                            <div
-                              key={member.id}
-                              className="size-6 rounded-full ring-2 ring-background bg-cover bg-center"
-                              style={{ backgroundImage: `url("${member.avatar}")` }}
-                              title={member.name}
-                            />
-                          ))}
-                          {project.teamMembers.length > 3 && (
-                            <div className="size-6 rounded-full ring-2 ring-background bg-muted flex items-center justify-center text-xs font-medium">
-                              +{project.teamMembers.length - 3}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <Tabs defaultValue="grid" className="w-full">
+              <TabsList>
+                <TabsTrigger value="grid" className="gap-2">
+                  <LayoutGrid className="h-4 w-4" />
+                  Grid
+                </TabsTrigger>
+                <TabsTrigger value="list" className="gap-2">
+                  <List className="h-4 w-4" />
+                  List
+                </TabsTrigger>
+                <TabsTrigger value="kanban" className="gap-2">
+                  <Kanban className="h-4 w-4" />
+                  Kanban
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="grid" className="mt-6">
+                <ProjectListView
+                  projects={filteredProjects}
+                  onProjectClick={handleProjectClick}
+                />
+              </TabsContent>
+
+              <TabsContent value="list" className="mt-6">
+                <ProjectTableView
+                  projects={filteredProjects}
+                  onProjectClick={handleProjectClick}
+                />
+              </TabsContent>
+
+              <TabsContent value="kanban" className="mt-6">
+                <ProjectKanbanView
+                  projects={filteredProjects}
+                  onProjectClick={handleProjectClick}
+                />
+              </TabsContent>
+            </Tabs>
           )}
         </div>
       </div>

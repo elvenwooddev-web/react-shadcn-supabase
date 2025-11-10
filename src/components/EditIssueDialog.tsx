@@ -185,12 +185,12 @@ export function EditIssueDialog({ issue, isOpen, onClose }: EditIssueDialogProps
           {/* Assigned To */}
           <div className="space-y-2">
             <Label htmlFor="assignedTo">Assigned To</Label>
-            <Select value={assignedToId} onValueChange={setAssignedToId}>
+            <Select value={assignedToId || 'unassigned'} onValueChange={(value) => setAssignedToId(value === 'unassigned' ? '' : value)}>
               <SelectTrigger id="assignedTo">
                 <SelectValue placeholder="Select team member" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Unassigned</SelectItem>
+                <SelectItem value="unassigned">Unassigned</SelectItem>
                 {teamMembers.map((member) => (
                   <SelectItem key={member.id} value={member.id}>
                     <div className="flex items-center gap-2">

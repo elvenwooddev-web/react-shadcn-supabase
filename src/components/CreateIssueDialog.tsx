@@ -154,12 +154,12 @@ export function CreateIssueDialog({
           {/* Assign To */}
           <div className="space-y-2">
             <Label htmlFor="assignedTo">Assign To (optional)</Label>
-            <Select value={assignedToId} onValueChange={setAssignedToId}>
+            <Select value={assignedToId || 'unassigned'} onValueChange={(value) => setAssignedToId(value === 'unassigned' ? '' : value)}>
               <SelectTrigger id="assignedTo">
                 <SelectValue placeholder="Select team member" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Unassigned</SelectItem>
+                <SelectItem value="unassigned">Unassigned</SelectItem>
                 {teamMembers.map((member) => (
                   <SelectItem key={member.id} value={member.id}>
                     {member.name} - {member.role}

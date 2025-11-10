@@ -2,6 +2,7 @@ import { ChevronDown, Download, CheckCircle, Clock, X, FileCheck, AlertCircle } 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useDocuments } from '@/contexts/DocumentContext'
+import { useProjects } from '@/contexts/ProjectContext'
 import type { DocumentCategory, DocumentStatus } from '@/types'
 import { cn } from '@/lib/utils'
 
@@ -63,7 +64,12 @@ const getStatusBadge = (status: DocumentStatus) => {
 }
 
 export function StageDocumentsTab() {
-  const { documents, updateDocumentStatus } = useDocuments()
+  const { documents: allDocuments, updateDocumentStatus } = useDocuments()
+  const { currentProject } = useProjects()
+
+  // Filter documents by current stage
+  const currentStage = currentProject?.currentStage
+  const documents = allDocuments.filter((doc) => doc.stage === currentStage)
 
   // Group documents by category
   const categoryDocuments = categories.map((category) => {

@@ -5,13 +5,20 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useTasks } from '@/contexts/TaskContext'
 import { useFiles } from '@/contexts/FileContext'
+import { useProjects } from '@/contexts/ProjectContext'
 import { TaskCard } from '@/components/TaskCard'
 import { StageDocumentsTab } from '@/components/StageDocumentsTab'
 
 export function TaskList() {
   const [activeTab, setActiveTab] = useState<'tasks' | 'files' | 'documents'>('tasks')
-  const { tasks } = useTasks()
-  const { files } = useFiles()
+  const { tasks: allTasks } = useTasks()
+  const { files: allFiles } = useFiles()
+  const { currentProject } = useProjects()
+
+  // Filter tasks and files by current project stage
+  const currentStage = currentProject?.currentStage
+  const tasks = allTasks.filter((task) => task.stage === currentStage)
+  const files = allFiles.filter((file) => file.requiredFrom === currentStage)
 
   return (
     <div className="bg-card rounded-xl p-6 border border-border">
