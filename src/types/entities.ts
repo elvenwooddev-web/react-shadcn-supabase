@@ -50,6 +50,43 @@ export interface ChecklistItem {
   completed: boolean;
 }
 
+export interface TimeEntry {
+  id: string;
+  userId: string;
+  userName: string;
+  taskId: string;
+  date: string;
+  hours: number;
+  minutes: number;
+  description?: string;
+  createdAt: Date;
+}
+
+export interface TaskComment {
+  id: string;
+  taskId: string;
+  author: TeamMember;
+  content: string;
+  mentions: string[]; // Array of user IDs mentioned
+  createdAt: Date;
+  updatedAt: Date;
+  edited: boolean;
+}
+
+export interface CustomFieldDefinition {
+  id: string;
+  name: string;
+  type: 'text' | 'number' | 'date' | 'select' | 'multiselect' | 'checkbox';
+  options?: string[]; // For select/multiselect types
+  required: boolean;
+  projectId?: string; // If null, it's global
+}
+
+export interface CustomFieldValue {
+  fieldId: string;
+  value: string | number | boolean | string[];
+}
+
 export interface Subtask {
   id: string;
   trackingId: string;
@@ -63,6 +100,15 @@ export interface Subtask {
   assignees?: TeamMember[];
   dueDate?: string;
   attachments?: AttachedFile[];
+  // Time tracking
+  estimatedHours?: number;
+  actualHours?: number;
+  timeEntries?: TimeEntry[];
+  // Dependencies
+  blockedBy?: string[]; // Array of task/subtask IDs
+  blocking?: string[]; // Array of task/subtask IDs
+  // Custom fields
+  customFields?: CustomFieldValue[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -81,6 +127,18 @@ export interface Task {
   checklistItems?: ChecklistItem[];
   subtasks?: Subtask[];
   attachments?: AttachedFile[];
+  // Time tracking
+  estimatedHours?: number;
+  actualHours?: number;
+  timeEntries?: TimeEntry[];
+  // Dependencies
+  blockedBy?: string[]; // Array of task IDs this task is blocked by
+  blocking?: string[]; // Array of task IDs this task is blocking
+  // Custom fields
+  customFields?: CustomFieldValue[];
+  // Comments & collaboration
+  comments?: TaskComment[];
+  watchers?: string[]; // Array of user IDs watching this task
   createdAt: Date;
   updatedAt: Date;
 }
@@ -139,8 +197,28 @@ export interface Project {
   taskCounter: number;
   subtaskCounter: number;
   issueCounter: number;
+  // Budget & tracking
+  budget?: number;
+  actualCost?: number;
+  currency?: string;
+  // Custom fields
+  customFields?: CustomFieldValue[];
+  // Tags for categorization
+  tags?: string[];
+  // Milestones
+  milestones?: ProjectMilestone[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ProjectMilestone {
+  id: string;
+  name: string;
+  description?: string;
+  dueDate: string;
+  completedDate?: string;
+  status: 'pending' | 'completed' | 'overdue';
+  linkedTaskIds?: string[];
 }
 
 export interface StageProgress {
@@ -203,4 +281,71 @@ export interface ProjectStats {
   totalFiles: number;
   uploadedFiles: number;
   completionPercentage: number;
+}
+
+// Saved Views & Filtering
+export interface FilterCriteria {
+  assignees?: string[]; // User IDs
+  statuses?: string[];
+  priorities?: TaskPriority[];
+  stages?: WorkflowStage[];
+  dateRange?: {
+    start: string;
+    end: string;
+  };
+  customFields?: {
+    fieldId: string;
+    value: string | number | boolean | string[];
+  }[];
+  searchQuery?: string;
+  tags?: string[];
+}
+
+export interface GroupingConfig {
+  groupBy: 'assignee' | 'status' | 'priority' | 'stage' | 'dueDate' | 'none';
+  sortBy: 'dueDate' | 'priority' | 'createdAt' | 'title' | 'status';
+  sortOrder: 'asc' | 'desc';
+}
+
+export interface SavedView {
+  id: string;
+  name: string;
+  description?: string;
+  viewType: 'list' | 'board' | 'timeline' | 'calendar' | 'table';
+  filters: FilterCriteria;
+  grouping: GroupingConfig;
+  projectId?: string; // If null, it's a global view
+  isDefault: boolean;
+  isShared: boolean;
+  createdBy: string; // User ID
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Notifications
+export interface Notification {
+  id: string;
+  userId: string;
+  type: 'task-assigned' | 'task-completed' | 'comment-added' | 'mention' | 'approval-pending' | 'deadline-approaching' | 'task-blocked';
+  title: string;
+  message: string;
+  relatedEntityType: 'task' | 'project' | 'approval' | 'comment';
+  relatedEntityId: string;
+  projectId?: string;
+  read: boolean;
+  createdAt: Date;
+}
+
+// Calendar Events
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  type: 'task' | 'milestone' | 'meeting' | 'deadline';
+  taskId?: string;
+  projectId?: string;
+  start: Date;
+  end: Date;
+  allDay: boolean;
+  color?: string;
+  description?: string;
 }

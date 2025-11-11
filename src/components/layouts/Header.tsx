@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { Search, Bell, Settings, LayoutGrid, Menu } from 'lucide-react'
+import { Search, Settings, LayoutGrid, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Avatar } from '@/components/ui/avatar'
+import { NotificationCenter } from '@/components/shared'
 
 interface HeaderProps {
   onMenuClick?: () => void
@@ -75,13 +76,9 @@ export function Header({ onMenuClick }: HeaderProps) {
           >
             <Search className="h-5 w-5" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-10 w-10 bg-muted hover:bg-muted/80 hidden sm:flex"
-          >
-            <Bell className="h-5 w-5" />
-          </Button>
+          <div className="hidden sm:flex">
+            <NotificationCenter />
+          </div>
           <Button
             variant="ghost"
             size="icon"

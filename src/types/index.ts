@@ -45,6 +45,16 @@ export type {
   IssueComment,
   Issue,
   ProjectStats,
+  TimeEntry,
+  TaskComment,
+  CustomFieldDefinition,
+  CustomFieldValue,
+  ProjectMilestone,
+  FilterCriteria,
+  GroupingConfig,
+  SavedView,
+  Notification,
+  CalendarEvent,
 } from './entities';
 
 // Custom status system

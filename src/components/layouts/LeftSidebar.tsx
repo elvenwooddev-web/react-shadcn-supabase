@@ -1,5 +1,5 @@
 import { NavLink, Link } from 'react-router-dom'
-import { LayoutGrid, Network, FolderOpen, MessageSquare, HelpCircle, Home, BarChart3, Users, Settings, User, FileText, AlertTriangle, X, Shield, Settings2 } from 'lucide-react'
+import { LayoutGrid, Network, FolderOpen, MessageSquare, HelpCircle, Home, BarChart3, Users, Settings, User, FileText, AlertTriangle, X, Shield, Settings2, CheckSquare, Calendar } from 'lucide-react'
 import { useProjects } from '@/contexts/ProjectContext'
 import { useIssues } from '@/contexts/IssueContext'
 import { useApprovals } from '@/contexts/ApprovalContext'
@@ -104,13 +104,13 @@ export function LeftSidebar({ isOpen = true, onClose }: LeftSidebarProps) {
           {!currentProject ? (
             /* All Projects Page Navigation */
             <>
-              <a
-                href="#"
+              <Link
+                to="/dashboard"
                 className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
               >
                 <BarChart3 className="h-5 w-5 text-muted-foreground" />
                 <span className="text-sm font-medium">Dashboard</span>
-              </a>
+              </Link>
 
               <Link
                 to="/"
@@ -118,6 +118,22 @@ export function LeftSidebar({ isOpen = true, onClose }: LeftSidebarProps) {
               >
                 <Home className="h-5 w-5 text-muted-foreground" />
                 <span className="text-sm font-medium">All Projects</span>
+              </Link>
+
+              <Link
+                to="/my-work"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
+              >
+                <CheckSquare className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm font-medium">My Work</span>
+              </Link>
+
+              <Link
+                to="/calendar"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
+              >
+                <Calendar className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm font-medium">Calendar</span>
               </Link>
 
               <Link

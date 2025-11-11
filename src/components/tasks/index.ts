@@ -5,3 +5,5 @@ export { TaskCard } from './TaskCard';
 export { TaskList } from './TaskList';
 export { TaskAttachments } from './TaskAttachments';
 export { TaskChecklists } from './TaskChecklists';
+export { TimeTrackingDialog } from './TimeTrackingDialog';
+export { TaskComments } from './TaskComments';

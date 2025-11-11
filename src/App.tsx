@@ -12,6 +12,8 @@ import { DocumentProvider } from '@/contexts/DocumentContext'
 import { TemplateProvider } from '@/contexts/TemplateContext'
 import { StageProvider } from '@/contexts/StageContext'
 import { WorkflowRulesProvider } from '@/contexts/WorkflowRulesContext'
+import { TimeTrackingProvider } from '@/contexts/TimeTrackingContext'
+import { NotificationProvider } from '@/contexts/NotificationContext'
 import { ProjectsListPage } from '@/pages/ProjectsListPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { NewProjectPage } from '@/pages/NewProjectPage'
@@ -25,6 +27,10 @@ import { TemplateEditorPage } from '@/pages/TemplateEditorPage'
 import { WorkflowPage } from '@/pages/WorkflowPage'
 import { FilesPage } from '@/pages/FilesPage'
 import { ChatPage } from '@/pages/ChatPage'
+import { MyWorkPage } from '@/pages/MyWorkPage'
+import { CalendarPage } from '@/pages/CalendarPage'
+import { DashboardPage } from '@/pages/DashboardPage'
+import { CommandPalette } from '@/components/shared'
 
 function App() {
   return (
@@ -42,8 +48,14 @@ function App() {
                           <IssueProvider>
                             <StageProvider>
                               <WorkflowRulesProvider>
+                                <TimeTrackingProvider>
+                                  <NotificationProvider>
+                          <CommandPalette />
                           <Routes>
                             <Route path="/" element={<ProjectsListPage />} />
+                            <Route path="/dashboard" element={<DashboardPage />} />
+                            <Route path="/my-work" element={<MyWorkPage />} />
+                            <Route path="/calendar" element={<CalendarPage />} />
                             <Route path="/projects/new" element={<NewProjectPage />} />
                             <Route path="/templates" element={<TemplatesListPage />} />
                             <Route path="/templates/:id/edit" element={<TemplateEditorPage />} />
@@ -62,6 +74,8 @@ function App() {
                             </Route>
                             <Route path="*" element={<Navigate to="/" replace />} />
                           </Routes>
+                                  </NotificationProvider>
+                                </TimeTrackingProvider>
                               </WorkflowRulesProvider>
                             </StageProvider>
                           </IssueProvider>
