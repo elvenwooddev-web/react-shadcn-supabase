@@ -41,9 +41,9 @@ export function LeftSidebar({ isOpen = true, onClose }: LeftSidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "flex h-full min-h-screen w-60 flex-col justify-between bg-card p-4 border-r border-border transition-transform duration-300 ease-in-out",
-          "lg:translate-x-0 lg:static lg:z-auto",
-          "fixed left-0 top-0 z-50",
+          "flex w-60 flex-col justify-between bg-card p-4 border-r border-border transition-transform duration-300 ease-in-out",
+          "lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:z-auto",
+          "fixed left-0 top-0 h-full z-50",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -105,18 +105,26 @@ export function LeftSidebar({ isOpen = true, onClose }: LeftSidebarProps) {
             /* All Projects Page Navigation */
             <>
               <Link
-                to="/dashboard"
-                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
-              >
-                <BarChart3 className="h-5 w-5 text-muted-foreground" />
-                <span className="text-sm font-medium">Dashboard</span>
-              </Link>
-
-              <Link
                 to="/"
                 className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
               >
                 <Home className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm font-medium">Home</span>
+              </Link>
+
+              <Link
+                to="/dashboard"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
+              >
+                <BarChart3 className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm font-medium">Analytics</span>
+              </Link>
+
+              <Link
+                to="/projects"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
+              >
+                <LayoutGrid className="h-5 w-5 text-muted-foreground" />
                 <span className="text-sm font-medium">All Projects</span>
               </Link>
 
@@ -195,6 +203,14 @@ export function LeftSidebar({ isOpen = true, onClose }: LeftSidebarProps) {
                 className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
               >
                 <Home className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm font-medium">Home</span>
+              </Link>
+
+              <Link
+                to="/projects"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted text-foreground"
+              >
+                <LayoutGrid className="h-5 w-5 text-muted-foreground" />
                 <span className="text-sm font-medium">All Projects</span>
               </Link>
 

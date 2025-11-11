@@ -73,9 +73,22 @@ export function UserProvider({ children }: { children: ReactNode }) {
     loadFromLocalStorage('currentUser', sampleUsers.Admin)
   )
 
+  // RBAC: User list state
+  const [users, setUsers] = useState<User[]>(() =>
+    loadFromLocalStorage('users', Object.values(sampleUsers))
+  )
+
+  // Save current user to localStorage
   useEffect(() => {
     saveToLocalStorage('currentUser', currentUser)
   }, [currentUser])
+
+  // Save users to localStorage
+  useEffect(() => {
+    if (users.length > 0) {
+      saveToLocalStorage('users', users)
+    }
+  }, [users])
 
   const switchDepartment = (department: Department) => {
     setCurrentUser(sampleUsers[department])
@@ -91,6 +104,66 @@ export function UserProvider({ children }: { children: ReactNode }) {
     ? DEPARTMENT_STAGES[currentUser.department]
     : []
 
+  // ============================================================================
+  // RBAC: USER CRUD OPERATIONS
+  // ============================================================================
+
+  const createUser = (userData: Omit<User, 'id'>): User => {
+    const newUser: User = {
+      ...userData,
+      id: `u-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+
+    setUsers(prev => [...prev, newUser])
+    return newUser
+  }
+
+  const updateUser = (id: string, updates: Partial<User>) => {
+    setUsers(prev =>
+      prev.map(user =>
+        user.id === id
+          ? { ...user, ...updates, updatedAt: new Date().toISOString() }
+          : user
+      )
+    )
+
+    // Update current user if it's being modified
+    if (currentUser?.id === id) {
+      setCurrentUser(prev => prev ? { ...prev, ...updates } : null)
+    }
+  }
+
+  const deleteUser = (id: string) => {
+    // Prevent deleting current user
+    if (currentUser?.id === id) {
+      console.warn('Cannot delete currently logged in user')
+      return
+    }
+
+    setUsers(prev => prev.filter(u => u.id !== id))
+  }
+
+  const getUser = (id: string): User | undefined => {
+    return users.find(u => u.id === id)
+  }
+
+  const activateUser = (id: string) => {
+    updateUser(id, { isActive: true })
+  }
+
+  const deactivateUser = (id: string) => {
+    // Prevent deactivating current user
+    if (currentUser?.id === id) {
+      console.warn('Cannot deactivate currently logged in user')
+      return
+    }
+
+    updateUser(id, { isActive: false })
+  }
+
   return (
     <UserContext.Provider
       value={{
@@ -99,6 +172,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
         switchDepartment,
         canAccessStage,
         visibleStages,
+        // RBAC: User management
+        users,
+        createUser,
+        updateUser,
+        deleteUser,
+        getUser,
+        activateUser,
+        deactivateUser,
       }}
     >
       {children}

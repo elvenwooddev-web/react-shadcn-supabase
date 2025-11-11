@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { LeftSidebar } from '@/components/layouts'
 import { WorkflowRulesTab } from '@/components/settings/WorkflowRulesTab'
 import { StatusConfigTab } from '@/components/settings/StatusConfigTab'
+import { RBACTab } from '@/components/settings/RBACTab'
 import { useProjects } from '@/contexts/ProjectContext'
 
 type SettingsTab = 'workflow' | 'status' | 'team' | 'appearance' | 'general'
@@ -29,10 +30,10 @@ export function SettingsPage() {
   ]
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex bg-background">
       {!isProjectSettings && <LeftSidebar />}
 
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-8 min-h-screen">
         <div className="container mx-auto max-w-6xl">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
@@ -87,11 +88,7 @@ export function SettingsPage() {
 
             {activeTab === 'status' && <StatusConfigTab />}
 
-            {activeTab === 'team' && (
-              <Card className="p-6">
-                <p className="text-muted-foreground">Team management coming soon...</p>
-              </Card>
-            )}
+            {activeTab === 'team' && <RBACTab />}
 
             {activeTab === 'appearance' && (
               <Card className="p-6">

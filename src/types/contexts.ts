@@ -77,6 +77,15 @@ export interface UserContextType {
   switchDepartment: (department: Department) => void;
   canAccessStage: (stage: WorkflowStage) => boolean;
   visibleStages: WorkflowStage[];
+
+  // RBAC: User Management
+  users: User[];
+  createUser: (user: Omit<User, 'id'>) => User;
+  updateUser: (id: string, updates: Partial<User>) => void;
+  deleteUser: (id: string) => void;
+  getUser: (id: string) => User | undefined;
+  activateUser: (id: string) => void;
+  deactivateUser: (id: string) => void;
 }
 
 export interface StageContextType {

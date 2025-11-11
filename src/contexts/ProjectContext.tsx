@@ -3,6 +3,8 @@ import type { Project, ProjectContextType, CreateProjectForm, TeamMember, Projec
 import { STAGE_TO_DEPARTMENT } from '@/types'
 import { generateId, saveToLocalStorage, loadFromLocalStorage } from '@/lib/helpers'
 import { loadTemplate } from '@/lib/templateLoader'
+import { useUser } from './UserContext'
+import { useRBAC } from './RBACContext'
 
 const WORKFLOW_STAGES: WorkflowStage[] = [
   'Sales',
@@ -105,6 +107,10 @@ function generateProjectCode(name: string, existingProjects: Project[]): string 
 }
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
+  // RBAC hooks
+  const { currentUser } = useUser()
+  const { hasPermission, canPerformAction } = useRBAC()
+
   const [projects, setProjects] = useState<Project[]>(() => {
     const loadedProjects = loadFromLocalStorage('projects', initialProjects)
 
@@ -152,6 +158,12 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   }, [currentProject])
 
   const createProject = (data: CreateProjectForm) => {
+    // RBAC: Check permission to create projects
+    if (!currentUser || !hasPermission(currentUser.id, 'project.create')) {
+      console.warn('Permission denied: Cannot create projects')
+      return
+    }
+
     const projectManager = sampleTeamMembers.find((tm) => tm.id === data.projectManagerId) || sampleTeamMembers[0]
     const projectId = generateId()
 
@@ -264,6 +276,31 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   }
 
   const updateProject = (id: string, data: Partial<Project>) => {
+    // RBAC: Check permission to edit projects
+    if (!currentUser) {
+      console.warn('Permission denied: No current user')
+      return
+    }
+
+    const project = projects.find(p => p.id === id)
+    if (!project) {
+      console.warn('Project not found')
+      return
+    }
+
+    // Check if user can edit this specific project
+    const permissionCheck = canPerformAction(currentUser.id, 'project.edit', project)
+    if (!permissionCheck.granted) {
+      // Fall back to checking edit.own or edit.all
+      const hasEditOwn = hasPermission(currentUser.id, 'project.edit.own')
+      const hasEditAll = hasPermission(currentUser.id, 'project.edit.all')
+
+      if (!hasEditAll && (!hasEditOwn || project.projectManager?.id !== currentUser.id)) {
+        console.warn('Permission denied: Cannot edit this project')
+        return
+      }
+    }
+
     setProjects((prev) =>
       prev.map((project) =>
         project.id === id
@@ -277,6 +314,27 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   }
 
   const deleteProject = (id: string) => {
+    // RBAC: Check permission to delete projects
+    if (!currentUser) {
+      console.warn('Permission denied: No current user')
+      return
+    }
+
+    const project = projects.find(p => p.id === id)
+    if (!project) {
+      console.warn('Project not found')
+      return
+    }
+
+    // Check if user can delete this specific project
+    const hasDeleteAll = hasPermission(currentUser.id, 'project.delete.all')
+    const hasDeleteOwn = hasPermission(currentUser.id, 'project.delete.own')
+
+    if (!hasDeleteAll && (!hasDeleteOwn || project.projectManager?.id !== currentUser.id)) {
+      console.warn('Permission denied: Cannot delete this project')
+      return
+    }
+
     setProjects((prev) => prev.filter((project) => project.id !== id))
     if (currentProject?.id === id) {
       setCurrentProject(projects[0] || null)

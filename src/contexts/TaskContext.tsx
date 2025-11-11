@@ -4,6 +4,7 @@ import { generateId, saveToLocalStorage, loadFromLocalStorage } from '@/lib/help
 import { useProjects } from './ProjectContext'
 import { useUser } from './UserContext'
 import { useApprovalRules } from './ApprovalRuleContext'
+import { useRBAC } from './RBACContext'
 
 const initialTasks: Task[] = [
   {
@@ -82,8 +83,9 @@ const TaskContext = createContext<TaskContextType | undefined>(undefined)
 
 export function TaskProvider({ children }: { children: ReactNode }) {
   const { currentProject, getNextTaskTrackingId, getNextSubtaskTrackingId } = useProjects()
-  const { canAccessStage } = useUser()
+  const { currentUser, canAccessStage } = useUser()
   const { applyRulesToEntity } = useApprovalRules()
+  const { hasPermission, canPerformAction } = useRBAC()
   const [allTasks, setAllTasks] = useState<Record<string, Task[]>>(() => {
     const loaded = loadFromLocalStorage('tasks', { p1: initialTasks })
 
@@ -124,6 +126,12 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   const createTask = (data: CreateTaskForm) => {
     if (!currentProject) return
 
+    // RBAC: Check permission to create tasks
+    if (!currentUser || !hasPermission(currentUser.id, 'task.create')) {
+      console.warn('Permission denied: Cannot create tasks')
+      return
+    }
+
     const newTask: Task = {
       id: generateId(),
       trackingId: getNextTaskTrackingId(),
@@ -150,6 +158,24 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   const updateTask = (id: string, data: Partial<Task>) => {
     if (!currentProject) return
 
+    // RBAC: Check permission to edit tasks
+    if (!currentUser) {
+      console.warn('Permission denied: No current user')
+      return
+    }
+
+    const task = allTasks[currentProject.id]?.find(t => t.id === id)
+    if (task) {
+      // Check if user can edit this specific task
+      const hasEditAll = hasPermission(currentUser.id, 'task.edit.all')
+      const hasEditOwn = hasPermission(currentUser.id, 'task.edit.own')
+
+      if (!hasEditAll && (!hasEditOwn || task.assignee?.id !== currentUser.id)) {
+        console.warn('Permission denied: Cannot edit this task')
+        return
+      }
+    }
+
     setAllTasks((prev) => ({
       ...prev,
       [currentProject.id]: prev[currentProject.id].map((task) =>
@@ -160,6 +186,23 @@ export function TaskProvider({ children }: { children: ReactNode }) {
 
   const deleteTask = (id: string) => {
     if (!currentProject) return
+
+    // RBAC: Check permission to delete tasks
+    if (!currentUser) {
+      console.warn('Permission denied: No current user')
+      return
+    }
+
+    const task = allTasks[currentProject.id]?.find(t => t.id === id)
+    if (task) {
+      const hasDeleteAll = hasPermission(currentUser.id, 'task.delete.all')
+      const hasDeleteOwn = hasPermission(currentUser.id, 'task.delete.own')
+
+      if (!hasDeleteAll && (!hasDeleteOwn || task.assignee?.id !== currentUser.id)) {
+        console.warn('Permission denied: Cannot delete this task')
+        return
+      }
+    }
 
     setAllTasks((prev) => ({
       ...prev,

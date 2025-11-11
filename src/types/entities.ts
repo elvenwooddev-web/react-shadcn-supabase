@@ -22,8 +22,13 @@ export interface User {
   name: string;
   email: string;
   avatar: string;
-  role: 'admin' | 'sales' | 'designer' | 'technical-designer' | 'procurement' | 'production' | 'execution';
+  role: 'admin' | 'sales' | 'designer' | 'technical-designer' | 'procurement' | 'production' | 'execution'; // Legacy field for backward compatibility
   department: Department;
+  roleIds?: string[]; // RBAC: Multiple roles supported
+  isActive?: boolean; // RBAC: User account status
+  createdAt?: string; // RBAC: Account creation timestamp
+  updatedAt?: string; // RBAC: Last update timestamp
+  lastLogin?: string; // RBAC: Last login timestamp
 }
 
 export interface TeamMember {

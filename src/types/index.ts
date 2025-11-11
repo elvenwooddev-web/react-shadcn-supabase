@@ -65,6 +65,24 @@ export type {
   StatusConfigContextType,
 } from './statuses';
 
+// RBAC system
+export type {
+  Permission,
+  PermissionScope,
+  PermissionCategory,
+  FieldPermission,
+  Role,
+  PermissionGroup,
+  RBACUser,
+  PermissionCheckResult,
+  EffectivePermissions,
+  RoleAssignment,
+  PermissionAuditLog,
+  RBACContextType,
+  PermissionAction,
+  ResourceType,
+} from './rbac';
+
 // Approval system
 export type {
   ApprovalConfig,

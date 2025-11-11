@@ -3,6 +3,7 @@ import type { RequiredFile, FileContextType, WorkflowStage } from '@/types'
 import { generateId, saveToLocalStorage, loadFromLocalStorage } from '@/lib/helpers'
 import { useProjects } from './ProjectContext'
 import { useUser } from './UserContext'
+import { useRBAC } from './RBACContext'
 
 const initialFiles: RequiredFile[] = [
   {
@@ -46,7 +47,8 @@ const FileContext = createContext<FileContextType | undefined>(undefined)
 
 export function FileProvider({ children }: { children: ReactNode }) {
   const { currentProject } = useProjects()
-  const { canAccessStage } = useUser()
+  const { currentUser, canAccessStage } = useUser()
+  const { hasPermission } = useRBAC()
   const [allFiles, setAllFiles] = useState<Record<string, RequiredFile[]>>(() =>
     loadFromLocalStorage('files', { p1: initialFiles })
   )
@@ -61,6 +63,12 @@ export function FileProvider({ children }: { children: ReactNode }) {
 
   const uploadFile = async (file: File, stage: WorkflowStage) => {
     if (!currentProject) return
+
+    // RBAC: Check permission to upload files
+    if (!currentUser || !hasPermission(currentUser.id, 'file.upload')) {
+      console.warn('Permission denied: Cannot upload files')
+      return
+    }
 
     // Create a blob URL for the file (in a real app, you'd upload to Supabase Storage)
     const fileUrl = URL.createObjectURL(file)
@@ -86,6 +94,12 @@ export function FileProvider({ children }: { children: ReactNode }) {
 
   const deleteFile = (id: string) => {
     if (!currentProject) return
+
+    // RBAC: Check permission to delete files
+    if (!currentUser || !hasPermission(currentUser.id, 'file.delete')) {
+      console.warn('Permission denied: Cannot delete files')
+      return
+    }
 
     setAllFiles((prev) => ({
       ...prev,

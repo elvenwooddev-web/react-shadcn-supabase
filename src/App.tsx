@@ -3,6 +3,7 @@ import { StatusConfigProvider } from '@/contexts/StatusConfigContext'
 import { ApprovalProvider } from '@/contexts/ApprovalContext'
 import { ApprovalRuleProvider } from '@/contexts/ApprovalRuleContext'
 import { UserProvider } from '@/contexts/UserContext'
+import { RBACProvider } from '@/contexts/RBACContext'
 import { ProjectProvider } from '@/contexts/ProjectContext'
 import { TaskProvider } from '@/contexts/TaskContext'
 import { IssueProvider } from '@/contexts/IssueContext'
@@ -14,6 +15,7 @@ import { StageProvider } from '@/contexts/StageContext'
 import { WorkflowRulesProvider } from '@/contexts/WorkflowRulesContext'
 import { TimeTrackingProvider } from '@/contexts/TimeTrackingContext'
 import { NotificationProvider } from '@/contexts/NotificationContext'
+import { HomePage } from '@/pages/HomePage'
 import { ProjectsListPage } from '@/pages/ProjectsListPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { NewProjectPage } from '@/pages/NewProjectPage'
@@ -30,6 +32,7 @@ import { ChatPage } from '@/pages/ChatPage'
 import { MyWorkPage } from '@/pages/MyWorkPage'
 import { CalendarPage } from '@/pages/CalendarPage'
 import { DashboardPage } from '@/pages/DashboardPage'
+import { AdvancedDashboardPage } from '@/pages/AdvancedDashboardPage'
 import { CommandPalette } from '@/components/shared'
 
 function App() {
@@ -37,7 +40,8 @@ function App() {
     <BrowserRouter>
       <StatusConfigProvider>
         <UserProvider>
-          <TemplateProvider>
+          <RBACProvider>
+            <TemplateProvider>
             <ProjectProvider>
               <TeamProvider>
                 <ApprovalProvider>
@@ -52,8 +56,9 @@ function App() {
                                   <NotificationProvider>
                           <CommandPalette />
                           <Routes>
-                            <Route path="/" element={<ProjectsListPage />} />
-                            <Route path="/dashboard" element={<DashboardPage />} />
+                            <Route path="/" element={<HomePage />} />
+                            <Route path="/projects" element={<ProjectsListPage />} />
+                            <Route path="/dashboard" element={<AdvancedDashboardPage />} />
                             <Route path="/my-work" element={<MyWorkPage />} />
                             <Route path="/calendar" element={<CalendarPage />} />
                             <Route path="/projects/new" element={<NewProjectPage />} />
@@ -87,6 +92,7 @@ function App() {
               </TeamProvider>
             </ProjectProvider>
           </TemplateProvider>
+          </RBACProvider>
         </UserProvider>
       </StatusConfigProvider>
     </BrowserRouter>
